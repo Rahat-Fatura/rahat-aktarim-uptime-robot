@@ -3,9 +3,9 @@ const config = require('./config/config');
 const logger = require('./config/logger');
 
 const server = app.listen(config.port, () => {
-  logger.info(`Listening to port ${config.port}`);
+  logger.info(`Listening to port ${config.port}`); // eslint-disable-line no-console
 });
-const exitHandler = () => {
+const exitHandler = async () => {
   if (server) {
     server.close(() => {
       logger.info('Server closed');
