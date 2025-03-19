@@ -8,6 +8,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prefer-const */
+
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { monitorService, monitorLogService, emailService } = require('../services');
@@ -21,7 +22,7 @@ async function renderJobs() {
   const monitors = await monitorService.runJob();
   monitors.map((monitor) => {
     console.log(monitor.interval);
-    startJob(monitor.id, monitor.interval, () => task(monitor));
+    startJob(monitor.id, () => task(monitor));
   });
 }
 
@@ -52,8 +53,7 @@ async function task(monitor) {
     await monitorLogService.createLog(monitor, result);
     await monitorService.updateMonitorById(monitor.id, monitor);
     // eslint-disable-next-line prettier/prettier
-  } 
-  else {
+  } else {
     await emailService.sendEmail(
       `<${user.email}>`,
       `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
@@ -91,37 +91,35 @@ async function sendRequest(monitor) {
   }
 }
 
-function startJob(monitorId, cronExpression, taskFunction) {
-  jobs[monitorId] = cron.schedule('0 * * * * *', taskFunction, { scheduled: true });
-  console.log(`🚀 Yeni job başlatıldı: ${monitorId} -> ${cronExpression}`);
+function startJob(monitorId, taskFunction) {
+  jobs[monitorId] = cron.schedule('*/20 * * * * *', taskFunction, { scheduled: true });
+  console.log(` Yeni job başlatıldı: ${monitorId}`);
 }
 
-function updateJob(monitorId, cronExpression, taskFunction) {
-  // Eğer aynı userId için bir cron job zaten varsa, önce iptal et
-  if (jobs[monitorId]) {
-    jobs[monitorId].stop();
-    console.log(`✅ Eski job durduruldu: ${monitorId}`);
+function updateJob(monitor, taskFunction) {
+  if (jobs[monitor.id]) {
+    jobs[monitor.id].stop();
+    console.log(` Eski job durduruldu: ${monitor.id}`);
   }
-
-  // Yeni cron job oluştur ve kaydet
-  jobs[monitorId] = cron.schedule(cronExpression, taskFunction, { scheduled: true });
-  console.log(`🚀 Yeni job başlatıldı: ${monitorId} -> ${cronExpression}`);
+  jobs[monitor.id] = cron.schedule('*/20 * * * * *', taskFunction, { scheduled: true });
+  console.log(` Yeni job başlatıldı: ${monitor.id}`);
 }
 
 function stopJob(monitorId) {
   if (jobs[monitorId]) {
     jobs[monitorId].stop();
     delete jobs[monitorId];
-    console.log(`⛔ Job durduruldu: ${monitorId}`);
+    console.log(` Job durduruldu: ${monitorId}`);
   } else {
-    console.log(`⚠️ Durdurulacak job bulunamadı: ${monitorId}`);
+    console.log(` Durdurulacak job bulunamadı: ${monitorId}`);
   }
 }
 
 const createMonitor = catchAsync(async (req, res) => {
   let monitor = await monitorService.createMonitor(req.body, req.user);
   if (monitor) {
-    startJob(monitor.id, '*/10 * * * * *', () => task(monitor));
+    await task(monitor);
+    startJob(monitor.id, () => task(monitor));
   }
   res.status(httpStatus.CREATED).send(monitor);
 });
@@ -133,9 +131,10 @@ const getMonitor = catchAsync(async (req, res) => {
 
 const updateMonitor = catchAsync(async (req, res) => {
   let monitor = await monitorService.updateMonitorById(req.params.monitorId, req.body);
-  if (monitor) {
-    updateJob(monitor.id, '*/20 * * * *', () => task(monitor));
+  if (monitor.is_active_by_owner) {
+    updateJob(monitor, () => task(monitor));
   }
+  monitor.status = null;
   res.status(httpStatus.OK).send(monitor);
 });
 
@@ -148,12 +147,14 @@ const deleteMonitor = catchAsync(async (req, res) => {
 const pauseMonitor = catchAsync(async (req, res) => {
   const monitor = await monitorService.updateMonitorById(req.params.monitorId, { is_active_by_owner: false, status: false });
   stopJob(monitor.id);
+  monitor.status = null;
   res.status(httpStatus.OK).send(monitor);
 });
 
 const playMonitor = catchAsync(async (req, res) => {
-  const monitor = await monitorService.updateMonitorById(req.params.monitorId, { is_active_by_owner: true, status: true });
-  startJob(monitor.id, monitor.method, () => task(monitor));
+  const monitor = await monitorService.updateMonitorById(req.params.monitorId, { is_active_by_owner: true, status: false });
+  startJob(monitor.id, () => task(monitor));
+  monitor.status = null;
   res.status(httpStatus.OK).send(monitor);
 });
 

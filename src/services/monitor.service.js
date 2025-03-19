@@ -23,9 +23,9 @@ const createMonitor = async (monitorBody, user) => {
 const getMonitor = async (user) => {
   let monitor;
   if (user.role == 'admin') {
-     monitor = await Monitor.findMany({ include: { logs: true } });
+    monitor = await Monitor.findMany({ include: { logs: true } });
   } else {
-     monitor = await Monitor.findMany({ where: { server_owner: { id: user.id } }, include: { logs: true } });
+    monitor = await Monitor.findMany({ where: { server_owner: { id: user.id } }, include: { logs: true } });
   }
   return monitor;
 };

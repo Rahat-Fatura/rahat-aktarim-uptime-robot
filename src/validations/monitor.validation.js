@@ -2,7 +2,7 @@ const joi = require('joi');
 
 const createMonitor = {
   body: joi.object().keys({
-    name: joi.string(),
+    name: joi.string().required(),
     method: joi.string().required(),
     host: joi.string().required(),
     port: joi.string(),
