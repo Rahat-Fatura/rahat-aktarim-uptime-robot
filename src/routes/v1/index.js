@@ -19,7 +19,7 @@ const defaultRoutes = [
   {
     path: '/monitor',
     route: monitorRoute,
-  }
+  },
 ];
 
 const devRoutes = [

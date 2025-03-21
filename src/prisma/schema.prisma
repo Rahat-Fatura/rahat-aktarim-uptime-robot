@@ -11,59 +11,60 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-
 }
 
 model User {
-  id   Int    @id @default(autoincrement())
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @default(now()) @updatedAt
-  deleted_at  DateTime?
-  status      Boolean  @default(true)
-  name        String  
-  email       String  @unique
-  password    String
-  manager     User? @relation("ManagerRelation", fields: [managerId], references: [id])
-  managerId   Int?  @unique // Müdür ID (Opsiyonel)
-  subordinates User? @relation("ManagerRelation")
-  role  Role  @default(user)
-  isEmailVerified Boolean @default(false)
-  Token       Token[]
-  monitor     Monitor[]
+  id              Int       @id @default(autoincrement())
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+  deleted_at      DateTime?
+  status          Boolean   @default(true)
+  name            String
+  email           String    @unique
+  password        String
+  manager         User?     @relation("ManagerRelation", fields: [managerId], references: [id])
+  managerId       Int?      @unique // Müdür ID (Opsiyonel)
+  subordinates    User?     @relation("ManagerRelation")
+  role            Role      @default(user)
+  isEmailVerified Boolean   @default(false)
+  Token           Token[]
+  monitor         Monitor[]
 }
 
-model Monitor{
-  id  Int @id @default(autoincrement())
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @default(now()) @updatedAt
-  deleted_at  DateTime?
-  name String?
-  method MethodType
-  host String @unique
-  port String?
-  body Json?
-  headers   Json? 
-  interval  Int     @default(5)
-  report_time Int   @default(30) 
-  status    Boolean?
-  server_owner User @relation(fields: [user_id], references: [id])
-  user_id  Int
-  logs  Log[]
-  is_active_by_owner Boolean @default(true)
-  allowedStatusCodes String[] @default(["200"])
-  is_process Boolean @default(false)
+model Monitor {
+  id                 Int        @id @default(autoincrement())
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @default(now()) @updatedAt
+  deleted_at         DateTime?
+  name               String?
+  method             MethodType
+  host               String     @unique
+  failCount          Int        @default(0)
+  body               Json?
+  headers            Json?
+  interval           Int     @default(5)
+  intervalUnit       String     @default("minutes")
+  report_time        Int        @default(1)
+  reportTimeUnit     String     @default("weeks")
+  status             Boolean?
+  server_owner       User       @relation(fields: [user_id], references: [id])
+  user_id            Int
+  logs               Log[]
+  is_active_by_owner Boolean    @default(true)
+  allowedStatusCodes String[]   @default(["200"])
+  is_process         Boolean    @default(false)
 
-  @@unique([user_id,host])
+  @@unique([user_id, host])
 }
 
 model Log {
-  id  Int  @id @default(autoincrement())
-  monitorId  Int
-  monitor Monitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
-  statusCode Int
+  id           Int      @id @default(autoincrement())
+  monitorId    Int
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  statusCode   Int
   responseTime Int
-  isError Boolean
-  createdAt DateTime @default(now())
+  isError      Boolean
+  createdAt    DateTime @default(now())
 }
 
 model Token {
@@ -90,7 +91,7 @@ enum TokenType {
   verifyEmail
 }
 
-enum MethodType{
+enum MethodType {
   GET
   POST
   PUT
@@ -99,4 +100,3 @@ enum MethodType{
   HEAD
   OPTIONS
 }
-

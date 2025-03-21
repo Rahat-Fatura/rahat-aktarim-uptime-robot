@@ -4,14 +4,22 @@ const createMonitor = {
   body: joi.object().keys({
     name: joi.string().required(),
     method: joi.string().required(),
-    host: joi.string().required(),
-    port: joi.string(),
+    host: joi
+      .string()
+      .uri({
+        scheme: ['http', 'https'],
+        allowRelative: false,
+        allowQuerySquareBrackets: true,
+      })
+      .required(),
     body: joi.object(),
     headers: joi.object(),
-    interval: joi.number(),
+    interval: joi.number().required(),
+    intervalUnit: joi.string().required(),
     report_time: joi.number(),
+    reportTimeUnit: joi.string(),
     server_owner: joi.number(),
-    allowedStatusCodes: joi.array().min(1).items(joi.string().min(3)).required(),
+    allowedStatusCodes: joi.array().min(1).items(joi.string().min(3).max(3)).required(),
   }),
 };
 
@@ -20,17 +28,24 @@ const updateMonitor = {
     monitorId: joi.string().required(),
   }),
   body: joi.object().keys({
-    updated_at: joi.date().default(new Date()),
-    name: joi.string(),
-    method: joi.string(),
-    host: joi.string(),
-    port: joi.string(),
+    name: joi.string().required(),
+    method: joi.string().required(),
+    host: joi
+      .string()
+      .uri({
+        scheme: ['http', 'https'],
+        allowRelative: false,
+        allowQuerySquareBrackets: true,
+      })
+      .required(),
     headers: joi.object(),
-    interval: joi.number(),
+    interval: joi.number().required(),
+    intervalUnit: joi.string().required(),
     report_time: joi.number(),
+    reportTimeUnit: joi.string(),
     status: joi.boolean(),
     is_active_by_owner: joi.boolean(),
-    allowedStatusCodes: joi.array().min(1).items(joi.string().min(3)),
+    allowedStatusCodes: joi.array().min(1).items(joi.string().min(3).max(3)).required(),
     is_process: joi.boolean(),
     body: joi.object(),
   }),

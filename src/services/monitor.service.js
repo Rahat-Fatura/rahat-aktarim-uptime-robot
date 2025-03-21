@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
 /* eslint-disable eqeqeq */
 /* eslint-disable no-undef */
@@ -77,6 +79,40 @@ const onExit = async () => {
     console.error('Veritabanı güncellenirken hata oluştu:', error);
   }
 };
+
+const cronExprension = (interval, intervalUnit) => {
+  
+  // eslint-disable-next-line default-case
+  switch (intervalUnit) {
+    case 'seconds': {
+      if (interval > 59) {
+        interval = 59;
+      }
+      if (interval < 1) {
+        interval = 1;
+      }
+      return `*/${interval} * * * * *`;
+    }
+    case 'minutes': {
+      if (interval > 59) {
+        interval = 59;
+      }
+      if (interval < 1) {
+        interval = 1;
+      }
+      return `0 */${interval} * * * *`;
+    }
+    case 'hours': {
+      if (interval > 24) {
+        interval = 24;
+      }
+      if (interval < 1) {
+        interval = 1;
+      }
+      return `0 0 */${interval} * * *`;
+    }
+  }
+};
 module.exports = {
   createMonitor,
   getMonitor,
@@ -85,4 +121,5 @@ module.exports = {
   deleteMonitorById,
   onExit,
   runJob,
+  cronExprension,
 };
