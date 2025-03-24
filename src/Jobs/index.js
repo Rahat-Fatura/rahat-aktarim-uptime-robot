@@ -50,7 +50,6 @@ async function renderJobs(monitorService) {
   console.log('RENDER ÇALIŞIYOR');
   const monitors = await monitorService.runJob();
   monitors.map((monitor) => {
-    console.log(monitor);
     startJob(monitor);
   });
 }

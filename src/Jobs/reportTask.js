@@ -28,11 +28,11 @@ async function reportTask(monitor) {
   const user = controlMonitor.server_owner;
   const logs = await monitorLogService.getLogsByTime(monitor.id, monitor.report_time, monitor.reportTimeUnit);
   const report = generateReport(logs);
-  const subject = `${monitor.name} için ${monitor.report_time} ${monitor.reportTimeUnits} Raporunuz`;
+  const subject = `${monitor.name} için ${monitor.report_time} ${monitor.reportTimeUnit} Raporunuz`;
   const text = `
     Merhaba,
 
-    İşte ${monitor.name} için son ${monitor.report_time} ${monitor.reportTimeUnits} içindeki sunucu istek raporunuz:
+    İşte ${monitor.name} için son ${monitor.report_time} ${monitor.reportTimeUnit} içindeki sunucu istek raporunuz:
 
     - Toplam istek sayısı: ${report.totalRequests || 0}
     - Başarılı istek sayısı: ${report.successRequests || 0}
@@ -54,12 +54,12 @@ const reportExprension = (report_time, reportTimeUnit) => {
   switch (reportTimeUnit) {
     case 'hours': {
       if (report_time > 24) {
-        return `0 0 * * *`;
+        return `0 0 * * * *`;
       }
       if (report_time < 1) {
         return '0 */59 * * * *';
       }
-      return `0  0 */${report_time} * *`;
+      return `0  0 */${report_time} * * *`;
     }
     case 'days': {
       if (report_time > 30) {
