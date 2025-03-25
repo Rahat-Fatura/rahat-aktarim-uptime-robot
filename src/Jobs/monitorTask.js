@@ -48,6 +48,8 @@ async function monitorTask(monitor) {
 
 async function sendRequest(monitor) {
   const startTime = Date.now();
+  let isError = false;
+  let response= {};
   try {
     const config = {
       method: monitor.method,
@@ -58,13 +60,14 @@ async function sendRequest(monitor) {
     if (['POST', 'PUT', 'PATCH'].includes(monitor.method)) {
       config.data = monitor.body || {};
     }
-    const response = await axios(config);
-    const isError = !monitor.allowedStatusCodes.includes(response.status.toString());
+    response = await axios(config);
+    isError = !monitor.allowedStatusCodes.includes(response.status.toString());
     const responseTime = Date.now() - startTime;
-    return { status: response.status, responseTime, isError, message: 'success' };
+    return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
+    isError = !monitor.allowedStatusCodes.includes(error.response.status.toString());
     const responseTime = Date.now() - startTime;
-    return { status: 0, responseTime, isError: true, message: error };
+    return { status: error.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   }
 }
 
