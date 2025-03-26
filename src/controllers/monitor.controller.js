@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
 /* eslint-disable prefer-const */
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
@@ -46,7 +48,7 @@ const pauseMonitor = catchAsync(async (req, res) => {
 });
 
 const playMonitor = catchAsync(async (req, res) => {
-  const monitor = await monitorService.updateMonitorById(req.params.monitorId, { is_active_by_owner: true, failCount: 0 });
+  const monitor = await monitorService.updateMonitorById(req.params.monitorId, { is_active_by_owner: true });
   startJob(monitor);
   res.status(httpStatus.OK).send(monitor);
 });

@@ -38,7 +38,7 @@ model Monitor {
   deleted_at         DateTime?
   name               String?
   method             MethodType
-  host               String     @unique
+  host               String     
   failCount          Int        @default(0)
   body               Json?
   headers            Json?

@@ -14,11 +14,11 @@ const Monitor = require('../utils/database').monitor;
  * @returns {Promise<User>}
  */
 const createMonitor = async (monitorBody, user) => {
-  if (await Monitor.findFirst({ where: { host: monitorBody.host } })) {
+  if (await Monitor.findFirst({ where: { user_id: user.id, host: monitorBody.host } })) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
   }
   const monitorData = Object.assign(monitorBody, { server_owner: { connect: { id: user.id } } });
-  const monitor = await Monitor.create({ data: monitorData });
+  const monitor = await Monitor.create({ data: monitorData }); 
   return monitor;
 };
 
@@ -43,12 +43,12 @@ const runJob = async () => {
 };
 
 const getMonitorById = async (id, flag) => {
-  const monitor = await Monitor.findUnique({ where: { id: Number(id) }, include: { server_owner: flag } });
+  const monitor = await Monitor.findUnique({ where: { id : Number(id)}, include: { server_owner: flag } });
   return monitor;
 };
 
 const updateMonitorById = async (monitorId, updateBody) => {
-  const monitor = await getMonitorById(monitorId);
+  const monitor = await getMonitorById(monitorId,false);
   if (!monitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Sunucu bulunamadı');
   }
