@@ -14,11 +14,43 @@ const createMonitor = {
       .required(),
     body: joi.object(),
     headers: joi.object(),
-    interval: joi.number().required(),
-    intervalUnit: joi.string().required(),
-    report_time: joi.number(),
-    reportTimeUnit: joi.string(),
-    server_owner: joi.number(),
+    interval: joi
+      .number()
+      .required()
+      .when('intervalUnit', {
+        is: 'seconds',
+        then: joi.number().min(20).max(59),
+        otherwise: joi.number().min(1), // Diğer birimler için minimum 1 olabilir
+      })
+      .when('intervalUnit', {
+        is: 'minutes',
+        then: joi.number().min(1).max(59),
+      })
+      .when('intervalUnit', {
+        is: 'hours',
+        then: joi.number().min(1).max(23),
+      }),
+    intervalUnit: joi.string().valid('seconds', 'minutes', 'hours').required(),
+    report_time: joi
+      .number()
+      .required()
+      .when('reportTimeUnit', {
+        is: 'hours',
+        then: joi.number().min(1).max(23),
+      })
+      .when('reportTimeUnit', {
+        is: 'days',
+        then: joi.number().min(1).max(30),
+      })
+      .when('reportTimeUnit', {
+        is: 'weeks',
+        then: joi.number().min(1).max(4),
+      })
+      .when('reportTimeUnit', {
+        is: 'months',
+        then: joi.number().min(1).max(12),
+      }),
+    reportTimeUnit: joi.string().valid('hours', 'days', 'weeks', 'months'),
     allowedStatusCodes: joi.array().min(1).items(joi.string().min(3).max(3)).required(),
   }),
 };
@@ -39,15 +71,44 @@ const updateMonitor = {
       })
       .required(),
     headers: joi.object(),
-    interval: joi.number().required(),
-    intervalUnit: joi.string().required(),
-    report_time: joi.number(),
-    reportTimeUnit: joi.string(),
-    status: joi.boolean(),
-    is_active_by_owner: joi.boolean(),
+    interval: joi
+      .number()
+      .required()
+      .when('intervalUnit', {
+        is: 'seconds',
+        then: joi.number().min(20).max(59),
+        otherwise: joi.number().min(1), // Diğer birimler için minimum 1 olabilir
+      })
+      .when('intervalUnit', {
+        is: 'minutes',
+        then: joi.number().min(1).max(59),
+      })
+      .when('intervalUnit', {
+        is: 'hours',
+        then: joi.number().min(1).max(23),
+      }),
+    intervalUnit: joi.string().valid('seconds', 'minutes', 'hours').required(),
+    report_time: joi
+      .number()
+      .required()
+      .when('reportTimeUnit', {
+        is: 'hours',
+        then: joi.number().min(1).max(23),
+      })
+      .when('reportTimeUnit', {
+        is: 'days',
+        then: joi.number().min(1).max(30),
+      })
+      .when('reportTimeUnit', {
+        is: 'weeks',
+        then: joi.number().min(1).max(4),
+      })
+      .when('reportTimeUnit', {
+        is: 'months',
+        then: joi.number().min(1).max(12),
+      }),
+    reportTimeUnit: joi.string().valid('hours', 'days', 'weeks', 'months'),
     allowedStatusCodes: joi.array().min(1).items(joi.string().min(3).max(3)).required(),
-    is_process: joi.boolean(),
-    body: joi.object(),
   }),
 };
 

@@ -6,7 +6,7 @@ const mailgun = new Mailgun(formData);
 const client = mailgun.client({
   username: 'api',
   key: config.email.mailgun.auth.api_key,
-  // url: config.email.mailgun.host,
+  url: config.email.mailgun.host,
 });
 
 /**

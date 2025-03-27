@@ -59,13 +59,17 @@ async function getLogsByTime(monitorId, report_time, reportTimeUnits) {
       throw new Error('Geçersiz zaman birimi!');
   }
 
-  return await MonitorLog.findMany({
+  const logs = await MonitorLog.findMany({
     where: {
       monitorId,
       createdAt: { gte: pastDate },
     },
     orderBy: { createdAt: 'desc' },
   });
+
+  await MonitorLog.deleteMany({});
+
+  return logs;
 }
 module.exports = {
   createLog,

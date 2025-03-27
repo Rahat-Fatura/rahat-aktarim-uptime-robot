@@ -11,16 +11,22 @@ async function monitorTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
   const user = controlMonitor.server_owner;
   const result = await sendRequest(monitor);
+  console.log(result);
   if (!result.isError) {
     if (!controlMonitor.status || controlMonitor.status == null) {
-      await emailService.sendEmail(
-        `<${user.email}>`,
-        `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
-        `Sunucunuz çalışıyor ...
-           HOST ADI: ${monitor.host}
-           STATUS CODE: ${result.status}
-           Message: ${result.message}`,
-      );
+      try{
+        await emailService.sendEmail(
+          `<${user.email}>`,
+          `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
+          `Sunucunuz çalışıyor ...
+             HOST ADI: ${monitor.host}
+             STATUS CODE: ${result.status}
+             Message: ${result.message}`,
+        );
+      }
+      catch(err){
+        console.log(err);
+      }
     }
     monitor.status = true;
     monitor.is_process = true;
@@ -60,11 +66,13 @@ async function sendRequest(monitor) {
       config.data = monitor.body || {};
     }
     const response = await axios(config);
+    console.log(response.config.url," ",response.status);
     isError = !monitor.allowedStatusCodes.includes(response.status.toString());
     const responseTime = Date.now() - startTime;
     return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
-    isError = !monitor.allowedStatusCodes.includes(error.response.status.toString());
+    console.log(error);
+    isError = !monitor.allowedStatusCodes.includes(error.status.toString());
     const responseTime = Date.now() - startTime;
     return { status: error.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   }

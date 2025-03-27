@@ -50,7 +50,7 @@ async function reportTask(monitor) {
 }
 
 const reportExprension = (report_time, reportTimeUnit) => {
-  // eslint-disable-next-line default-case
+  // eslint-disable-next-line default-case 
   switch (reportTimeUnit) {
     case 'hours': {
       if (report_time > 24) {
