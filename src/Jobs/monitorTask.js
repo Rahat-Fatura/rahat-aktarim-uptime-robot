@@ -69,9 +69,14 @@ async function sendRequest(monitor) {
     const responseTime = Date.now() - startTime;
     return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
-    isError = !monitor.allowedStatusCodes.includes(error.status.toString());
+    if(error.status){
+      isError = !monitor.allowedStatusCodes.includes(error.status.toString());
+    }
+    else{
+      isError = true;
+    }
     const responseTime = Date.now() - startTime;
-    return { status: error.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
+    return { status: error.status || 0, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   }
 }
 
