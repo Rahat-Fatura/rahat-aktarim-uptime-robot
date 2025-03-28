@@ -70,6 +70,7 @@ const updateMonitor = {
         allowQuerySquareBrackets: true,
       })
       .required(),
+    body: joi.object(),
     headers: joi.object(),
     interval: joi
       .number()
