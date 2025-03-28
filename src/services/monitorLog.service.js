@@ -22,20 +22,6 @@ const getMonitorLogs = async (user) => {
   return monitorLogs;
 };
 
-async function getLogsLast24Hours(monitorId) {
-  const lastDay = new Date();
-  lastDay.setDate(lastDay.getDate() - 1); // 24 saat öncesi
-
-  // eslint-disable-next-line no-return-await
-  return await MonitorLog.findMany({
-    where: {
-      monitorId,
-      createdAt: { gte: lastDay }, // createdAt >= lastDay
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-}
-
 async function getLogsByTime(monitorId, report_time, reportTimeUnits) {
   const now = new Date();
   // eslint-disable-next-line prefer-const
@@ -74,6 +60,5 @@ async function getLogsByTime(monitorId, report_time, reportTimeUnits) {
 module.exports = {
   createLog,
   getMonitorLogs,
-  getLogsLast24Hours,
   getLogsByTime,
 };

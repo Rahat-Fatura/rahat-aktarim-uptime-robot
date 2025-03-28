@@ -67,26 +67,11 @@ const deleteMonitorById = async (deleteMonitorId) => {
   return monitor;
 };
 
-const onExit = async () => {
-  try {
-    const data = await Monitor.updateMany({
-      where: {}, // Tüm kayıtları güncellemek için boş where kullan
-      data: { is_process: false, status: false },
-    });
-    console.log(`Toplam ${data.count} kayıt güncellendi.`);
-    return data;
-  } catch (error) {
-    console.error('Veritabanı güncellenirken hata oluştu:', error);
-  }
-};
-
-
 module.exports = {
   createMonitor,
   getMonitor,
   getMonitorById,
   updateMonitorById,
   deleteMonitorById,
-  onExit,
   runJob,
 };

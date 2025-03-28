@@ -20,6 +20,7 @@ function startJob(monitor) {
     reportJobs[monitor.id] = cron.schedule(reportExprension(monitor.report_time, monitor.reportTimeUnit),()=> reportTask(monitor), {  
       scheduled: true,
     });
+    console.log(` Job başlatıldı: ${monitor.id}`);
   } catch (error) {
     console.log(` Hata: ${error}`);
   }

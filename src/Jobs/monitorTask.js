@@ -11,7 +11,6 @@ async function monitorTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
   const user = controlMonitor.server_owner;
   const result = await sendRequest(monitor);
-  console.log(result);
   if (!result.isError) {
     if (!controlMonitor.status || controlMonitor.status == null) {
       try{
@@ -66,12 +65,10 @@ async function sendRequest(monitor) {
       config.data = monitor.body || {};
     }
     const response = await axios(config);
-    console.log(response.config.url," ",response.status);
     isError = !monitor.allowedStatusCodes.includes(response.status.toString());
     const responseTime = Date.now() - startTime;
     return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
-    console.log(error);
     isError = !monitor.allowedStatusCodes.includes(error.status.toString());
     const responseTime = Date.now() - startTime;
     return { status: error.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
