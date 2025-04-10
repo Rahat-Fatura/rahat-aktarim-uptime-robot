@@ -1,9 +1,16 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable prettier/prettier */
+/* eslint-disable prefer-const */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-unused-vars */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable camelcase */
 /* eslint-disable prettier/prettier */
-const { monitorService, monitorLogService, emailService } = require('../services');
+const { monitorService, monitorLogService, emailService } = require('../../services');
 
 function generateReport(logs) {
   if (logs.length === 0) return null;
@@ -49,49 +56,6 @@ async function reportTask(monitor) {
   )
 }
 
-const reportExprension = (report_time, reportTimeUnit) => {
-  // eslint-disable-next-line default-case 
-  switch (reportTimeUnit) {
-    case 'hours': {
-      if (report_time > 24) {
-        return `0 0 * * * *`;
-      }
-      if (report_time < 1) {
-        return '0 */59 * * * *';
-      }
-      return `0  0 */${report_time} * * *`;
-    }
-    case 'days': {
-      if (report_time > 30) {
-        return `0 0 0 1 * *`;
-      }
-      if (report_time < 1) {
-        return '0 0 */23 * * *';
-      }
-      return `0 0 0 */${report_time} * *`;
-    }
-    case 'weeks': {
-      if (report_time > 3) {
-        return `0 0 0 1 * *`;
-      }
-      if (report_time < 1) {
-        return `0 0 0 */6 * *`;
-      }
-      return `0 0 0 */${report_time*7} * *`;
-    }
-    case 'months': {
-      if (report_time > 12) {
-        return `0 0 0 1 1 *`;
-      }
-      if (report_time < 1) {
-        return `0 0 0 1 * *`;
-      }
-      return `0 0 0 1 */${report_time} *`;
-    }
-  }
-};
-
 module.exports = {
   reportTask,
-  reportExprension,
 };

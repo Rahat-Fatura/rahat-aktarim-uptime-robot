@@ -5,8 +5,9 @@
 /* eslint-disable prefer-const */
 /* eslint-disable import/newline-after-import */
 /* eslint-disable import/order */
-const { monitorTask, cronExprension } = require('./monitorTask');
-const { reportTask, reportExprension } = require('./reportTask');
+const { monitorTask } = require('./tasks/monitorTask');
+const { reportTask } = require('./tasks/reportTask');
+const { cronExprension } = require('./utils/taskUtils');
 const cron = require('node-cron');
 let jobs = {};
 let reportJobs = {};
@@ -14,10 +15,11 @@ let reportJobs = {};
 function startJob(monitor) {
   try {
     monitorTask(monitor);
+    console.log(` Job başlatıldı: ${monitor.name}  `,cronExprension(monitor.interval, monitor.intervalUnit));
     jobs[monitor.id] = cron.schedule(cronExprension(monitor.interval, monitor.intervalUnit),()=> monitorTask(monitor), {
       scheduled: true,
     });
-    reportJobs[monitor.id] = cron.schedule(reportExprension(monitor.report_time, monitor.reportTimeUnit),()=> reportTask(monitor), {  
+    reportJobs[monitor.id] = cron.schedule(cronExprension(monitor.report_time, monitor.reportTimeUnit),()=> reportTask(monitor), {  
       scheduled: true,
     });
     console.log(` Job başlatıldı: ${monitor.id}`);

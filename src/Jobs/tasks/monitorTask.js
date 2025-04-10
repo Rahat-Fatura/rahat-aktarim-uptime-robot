@@ -4,7 +4,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-use-before-define */
-const { monitorService, monitorLogService, emailService } = require('../services');
+const { monitorService, monitorLogService, emailService } = require('../../services');
 const axios = require('axios');
 
 async function monitorTask(monitor) {
@@ -80,43 +80,8 @@ async function sendRequest(monitor) {
   }
 }
 
-const cronExprension = (interval, intervalUnit) => {
-  
-  // eslint-disable-next-line default-case
-  switch (intervalUnit) {
-    case 'seconds': {
-      if (interval > 59) {
-        return `0 * * * * *`;
-      }
-      if (interval < 1) {
-        interval = 10;
-      }
-      return `*/${interval} * * * * *`;
-    }
-    case 'minutes': {
-      if (interval > 59) {
-        interval = 59;
-      }
-      if (interval < 1) {
-        interval = 1;
-      }
-      return `0  */${interval} * * * *`;
-    }
-    case 'hours': {
-      if (interval > 24) {
-        interval = 23;
-      }
-      if (interval < 1) {
-        interval = 1;
-      }
-      return `0 0 */${interval} * * *`;
-    }
-  }
-};
-
 module.exports = {
   monitorTask,
-  cronExprension,
 }
 
 
