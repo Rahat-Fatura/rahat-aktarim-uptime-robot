@@ -1,4 +1,9 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable no-empty */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-unused-vars */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable prettier/prettier */
 /* eslint-disable import/order */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
@@ -9,47 +14,50 @@ const axios = require('axios');
 
 async function monitorTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
-  const user = controlMonitor.server_owner;
-  const result = await sendRequest(monitor);
-  if (!result.isError) {
-    if (!controlMonitor.status || controlMonitor.status == null) {
-      try{
-        await emailService.sendEmail(
-          `<${user.email}>`,
-          `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
-          `Sunucunuz çalışıyor ...
+  const maintanance = controlMonitor.maintanance;
+  const user = controlMonitor.serverOwner;
+  if (maintanance && maintanance.status) {
+    monitor.status = 'maintanance';
+    monitor.isProcess = true;
+    await monitorService.updateMonitorById(monitor.id, monitor);
+  } else {
+    const result = await sendRequest(monitor);
+    if (!result.isError) {
+      if (controlMonitor.status === 'down' || controlMonitor.status === 'uncertain') {
+        try {
+          await emailService.sendEmail(
+            `<${user.email}>`,
+            `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
+            `Sunucunuz çalışıyor ...
              HOST ADI: ${monitor.host}
              STATUS CODE: ${result.status}
              Message: ${result.message}`,
-        );
+          );
+        } catch (err) {
+          console.log(err);
+        }
       }
-      catch(err){
-        console.log(err);
-      }
-    }
-    monitor.status = true;
-    monitor.is_process = true;
-    monitor.failCount = 0;
-    await monitorLogService.createLog(monitor, result);
-    await monitorService.updateMonitorById(monitor.id, monitor);
-    // eslint-disable-next-line prettier/prettier, eqeqeq
-  } else {
-    monitor.failCount += 1;
-    await emailService.sendEmail(
-      `<${user.email}>`,
-      `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
-      `Sunucunuz çalışmıyor !!!
+      monitor.status = 'up';
+      monitor.isProcess = true;
+      await monitorLogService.createLog(monitor, result);
+      await monitorService.updateMonitorById(monitor.id, monitor);
+      // eslint-disable-next-line prettier/prettier, eqeqeq
+    } else {
+      await emailService.sendEmail(
+        `<${user.email}>`,
+        `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
+        `Sunucunuz çalışmıyor !!!
          HOST ADI: ${monitor.host}
           STATUS CODE: ${result.status}
           Message: ${result.message}`,
       );
-      monitor.is_process = true;
-      monitor.status = false;
+      monitor.isProcess = true;
+      monitor.status = 'down';
       await monitorLogService.createLog(monitor, result);
       await monitorService.updateMonitorById(monitor.id, monitor);
+    }
   }
 }
-
 
 async function sendRequest(monitor) {
   const startTime = Date.now();
@@ -59,7 +67,7 @@ async function sendRequest(monitor) {
       method: monitor.method,
       url: monitor.host,
       headers: monitor.headers || {},
-      timeout: 30000,
+      timeout: 10000,
     };
     if (['POST', 'PUT', 'PATCH'].includes(monitor.method)) {
       config.data = monitor.body || {};
@@ -69,12 +77,12 @@ async function sendRequest(monitor) {
     const responseTime = Date.now() - startTime;
     return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
-    if(error.status){
+    if (error.status) {
       isError = !monitor.allowedStatusCodes.includes(error.status.toString());
-    }
-    else{
+    } else {
       isError = true;
     }
+    console.log('error', error);
     const responseTime = Date.now() - startTime;
     return { status: error.status || 0, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   }
@@ -82,6 +90,5 @@ async function sendRequest(monitor) {
 
 module.exports = {
   monitorTask,
-}
-
-
+  sendRequest,
+};

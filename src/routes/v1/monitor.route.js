@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const express = require('express');
 const auth = require('../../middlewares/auth');
 
@@ -37,4 +38,54 @@ router.delete(
   validate(monitorValidate.deleteMonitor),
   monitorController.deleteMonitor,
 );
+
+router.get(
+  '/logs',
+  auth('getUsers'),
+  monitorController.getMonitorWithLogs,
+);
+
+router.get(
+  '/instant-Control',
+  auth('getUsers'),
+  monitorController.getInstantControlMonitor,
+);
+
+router.get(
+  '/instant-Control/:monitorId',
+  auth('getUsers'),
+  accessToMonitor(),
+  monitorController.sentRequestInstantControlMonitor,
+);
+
+router.post(
+  '/:monitorId/maintanance',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.monitorMaintenance), 
+  monitorController.createMaintananceMonitor,
+);
+
+router.put(
+  '/:monitorId/maintanance/cancel',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.stopMaintananceJob), 
+  monitorController.stopMaintanance,
+);
+
+router.put(
+  '/:monitorId/maintanance/task/cancel',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.stopMaintananceJob), 
+  monitorController.cancelMaintananceTask,
+);
+
+router.get(
+  '/maintanance',
+  auth('getUsers'),
+  monitorController.getMaintananceMonitor,
+);
+
 module.exports = router;

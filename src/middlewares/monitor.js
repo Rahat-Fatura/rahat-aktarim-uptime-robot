@@ -9,7 +9,7 @@ const catchAsync = require('../utils/catchAsync');
 
 const accessToMonitor =()=>catchAsync(async (req, res, next) => {
   const monitor = await monitorService.getMonitorById(req.params.monitorId,false);
-  if (monitor.user_id !== req.user.id) {
+  if (monitor.userId !== req.user.id) {
     return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
   }
   next();

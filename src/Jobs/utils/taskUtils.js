@@ -1,8 +1,28 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-param-reassign */
 /* eslint-disable prefer-const */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-nested-ternary */
+
+const dayjs = require('dayjs');
+
+function isoToCron(isoDate) {
+  const date = dayjs(isoDate);
+  if (!date.isValid()) {
+    throw new Error('Geçersiz tarih formatı');
+  }
+
+  const second = date.second(); // Saniye
+  const minute = date.minute(); // Dakika
+  const hour = date.hour(); // Saat
+  const day = date.date(); // Gün
+  const month = date.month() + 1; // Ay (0-11 yerine 1-12)
+  const dayOfWeek = date.day(); // Haftanın günü (0-6, 0 Pazar)
+
+  return `* ${minute} ${hour} ${day} ${month} *`;
+}
 
 const cronExprension = (time, timeUnit) => {
   const now = new Date();
@@ -64,4 +84,5 @@ const cronExprension = (time, timeUnit) => {
 
 module.exports = {
   cronExprension,
+  isoToCron,
 };

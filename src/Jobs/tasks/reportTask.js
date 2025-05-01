@@ -1,3 +1,6 @@
+/* eslint-disable no-empty */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable array-callback-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-nested-ternary */
@@ -30,32 +33,55 @@ function generateReport(logs) {
   };
 }
 
+function generateReportCollective(monitors){
+  console.log("monitors is type of", Array.isArray(monitors));
+  const report = monitors.map((monitor) => {
+    const logs =generateReport(monitor.logs);
+    return {
+      id: monitor.id,
+      name: monitor.name,
+      host: monitor.host,
+      isActiveByOwner: monitor.isActiveByOwner,
+      logs
+    };
+  })
+  console.log(report);
+  return report;
+}
+ 
 async function reportTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
-  const user = controlMonitor.server_owner;
-  const logs = await monitorLogService.getLogsByTime(monitor.id, monitor.report_time, monitor.reportTimeUnit);
-  const report = generateReport(logs);
-  const subject = `${monitor.name} için ${monitor.report_time} ${monitor.reportTimeUnit} Raporunuz`;
-  const text = `
-    Merhaba,
+  const user = controlMonitor.serverOwner;
+  const maintanance = controlMonitor.maintanance;
+  if (maintanance && maintanance.status) { 
+  }else{
+    const logs = await monitorLogService.getLogsByTime(monitor.id, monitor.reportTime, monitor.reportTimeUnit);
+    const report = generateReport(logs);
+    const subject = `${monitor.name} için ${monitor.reportTime} ${monitor.reportTimeUnit} Raporunuz`;
+    const text = `
+      Merhaba,
+  
+      İşte ${monitor.name} için son ${monitor.reportTime} ${monitor.reportTimeUnit} içindeki sunucu istek raporunuz:
+  
+      - Toplam istek sayısı: ${report.totalRequests || 0}
+      - Başarılı istek sayısı: ${report.successRequests || 0}
+      - Hatalı istek sayısı: ${report.failedRequests || 0}
+      - İsteklerin ortalama yanıt süresi: ${report.avgResponseTime || 0} ms
+      - Başarı Oranı: ${report.successRate || '0.00%'}
+  
+      İyi günler dileriz!
+    `;
+    await emailService.sendEmail(
+      `<${user.email}>`,
+      subject,
+      text,
+    )
+  }
 
-    İşte ${monitor.name} için son ${monitor.report_time} ${monitor.reportTimeUnit} içindeki sunucu istek raporunuz:
-
-    - Toplam istek sayısı: ${report.totalRequests || 0}
-    - Başarılı istek sayısı: ${report.successRequests || 0}
-    - Hatalı istek sayısı: ${report.failedRequests || 0}
-    - İsteklerin ortalama yanıt süresi: ${report.avgResponseTime || 0} ms
-    - Başarı Oranı: ${report.successRate || '0.00%'}
-
-    İyi günler dileriz!
-  `;
-  await emailService.sendEmail(
-    `<${user.email}>`,
-    subject,
-    text,
-  )
 }
 
 module.exports = {
   reportTask,
+  generateReport,
+  generateReportCollective,
 };

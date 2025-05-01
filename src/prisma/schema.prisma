@@ -33,28 +33,37 @@ model User {
 
 model Monitor {
   id                 Int        @id @default(autoincrement())
-  created_at         DateTime   @default(now())
-  updated_at         DateTime   @default(now()) @updatedAt
-  deleted_at         DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @default(now()) @updatedAt
+  deletedAt          DateTime?
   name               String?
   method             MethodType
   host               String     
-  failCount          Int        @default(0)
   body               Json?
   headers            Json?
-  interval           Int     @default(5)
+  interval           Int        @default(5)
   intervalUnit       String     @default("minutes")
-  report_time        Int        @default(1)
+  reportTime         Int        @default(1)
   reportTimeUnit     String     @default("weeks")
-  status             Boolean?
-  server_owner       User       @relation(fields: [user_id], references: [id])
-  user_id            Int
+  status             Status     @default(uncertain)
+  serverOwner        User       @relation(fields: [userId], references: [id])
+  userId             Int
   logs               Log[]
-  is_active_by_owner Boolean    @default(true)
+  maintanance        Maintanance? 
+  isActiveByOwner    Boolean    @default(true)
   allowedStatusCodes String[]   @default(["200"])
-  is_process         Boolean    @default(false)
+  isProcess          Boolean    @default(false)
 
-  @@unique([user_id, host])
+  @@unique([userId, host])
+}
+
+model Maintanance {
+  id Int @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  status Boolean
+  monitor Monitor @relation(fields: [monitorId], references: [id])
+  monitorId Int @unique
 }
 
 model Log {
@@ -99,4 +108,11 @@ enum MethodType {
   DELETE
   HEAD
   OPTIONS
+}
+
+enum Status {
+  up
+  down
+  uncertain
+  maintanance
 }

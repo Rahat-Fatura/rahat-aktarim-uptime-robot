@@ -18,11 +18,11 @@ const createLog = async (monitor, result) => {
 };
 
 const getMonitorLogs = async (user) => {
-  const monitorLogs = await MonitorLog.findMany({ where: { server_owner: { id: user.id } } });
+  const monitorLogs = await MonitorLog.findMany({ where: { serverOwner: { id: user.id } } });
   return monitorLogs;
 };
 
-async function getLogsByTime(monitorId, report_time, reportTimeUnits) {
+async function getLogsByTime(monitorId, reportTime, reportTimeUnits) {
   const now = new Date();
   // eslint-disable-next-line prefer-const
   let pastDate = new Date(now);
@@ -30,16 +30,16 @@ async function getLogsByTime(monitorId, report_time, reportTimeUnits) {
   // Kullanıcının belirttiği süreyi hesapla
   switch (reportTimeUnits) {
     case 'months':
-      pastDate.setMonth(now.getMonth() - report_time);
+      pastDate.setMonth(now.getMonth() - reportTime);
       break;
     case 'hours':
-      pastDate.setHours(now.getHours() - report_time);
+      pastDate.setHours(now.getHours() - reportTime);
       break;
     case 'days':
-      pastDate.setDate(now.getDate() - report_time);
+      pastDate.setDate(now.getDate() - reportTime);
       break;
     case 'weeks':
-      pastDate.setMinutes(now.getMinutes() - report_time);
+      pastDate.setMinutes(now.getMinutes() - reportTime);
       break;
     default:
       throw new Error('Geçersiz zaman birimi!');

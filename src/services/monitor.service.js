@@ -4,6 +4,7 @@
 /* eslint-disable eqeqeq */
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
+const axios = require('axios');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const Monitor = require('../utils/database').monitor;
@@ -13,12 +14,14 @@ const Monitor = require('../utils/database').monitor;
  * @param {Object} monitorBody
  * @returns {Promise<User>}
  */
-const createMonitor = async (monitorBody, user) => {
-  if (await Monitor.findFirst({ where: { user_id: user.id, host: monitorBody.host } })) {
+const createMonitor = async (monitorBody, user) => { 
+  if (await Monitor.findFirst({ where: { userId: user.id, host: monitorBody.host } })) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
   }
-  const monitorData = Object.assign(monitorBody, { server_owner: { connect: { id: user.id } } });
+  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } } });
+  console.log("Create monitor:",monitorData);
   const monitor = await Monitor.create({ data: monitorData }); 
+  console.log("Monitor created:",monitor);
   return monitor;
 };
 
@@ -27,27 +30,26 @@ const getMonitor = async (user) => {
   if (user.role == 'admin') {
     monitor = await Monitor.findMany({ include: { logs: true } });
   } else {
-    monitor = await Monitor.findMany({ where: { server_owner: { id: user.id } }, include: { logs: true } });
+    try {
+      monitor = await Monitor.findMany({ where: { serverOwner: { id: user.id } },
+         include: { logs: true },
+      });
+    }
+    catch (error) {
+      console.log("Error fetching monitors:", error);
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching monitors');
+    }
   }
   return monitor;
 };
 
-const runJob = async () => {
-  const monitors = await Monitor.findMany({
-    where: {
-      is_active_by_owner: true,
-      is_process: true,
-    },
-  });
-  return monitors;
-};
-
-const getMonitorById = async (id, flag) => {
-  const monitor = await Monitor.findUnique({ where: { id : Number(id)}, include: { server_owner: flag } });
+const getMonitorById = async (monitorId, flag) => {
+  const monitor = await Monitor.findUnique({ where: { id : Number(monitorId)}, include: { serverOwner: flag, maintanance: flag } });
   return monitor;
 };
 
 const updateMonitorById = async (monitorId, updateBody) => {
+  console.log("**************************************************");
   const monitor = await getMonitorById(monitorId,false);
   if (!monitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Sunucu bulunamadı');
@@ -57,14 +59,41 @@ const updateMonitorById = async (monitorId, updateBody) => {
   const newMonitor = await Monitor.update({ where: { id: Number(monitorId) }, data: monitorData });
   return newMonitor;
 };
-
+ 
 const deleteMonitorById = async (deleteMonitorId) => {
-  const monitor = await getMonitorById(deleteMonitorId);
+  const monitor = await getMonitorById(deleteMonitorId,true);
   if (!monitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Monitor not found');
   }
   await Monitor.delete({ where: { id: Number(deleteMonitorId) } });
   return monitor;
+};
+
+const getMaintenance = async (user) => {
+  const monitor = await Monitor.findMany({ where: { serverOwner: { id: user.id }},
+     select: { id: true,
+               host: true,
+               name: true,
+               status: true,
+               maintanance:{
+                select: {
+                  startTime: true,
+                  endTime: true,
+                  status: true,
+                }
+                } 
+              } });
+  return monitor;
+}
+
+const runJob = async () => {
+  const monitors = await Monitor.findMany({
+    where: {
+      isActiveByOwner: true,
+      isProcess: true,
+    },
+  });
+  return monitors;
 };
 
 module.exports = {
@@ -74,4 +103,5 @@ module.exports = {
   updateMonitorById,
   deleteMonitorById,
   runJob,
+  getMaintenance
 };

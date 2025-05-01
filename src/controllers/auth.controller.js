@@ -49,6 +49,12 @@ const verifyEmail = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const passwordChange = catchAsync(async (req, res) => {
+  const user = await authService.changePassword(req.user, req.body.password, req.body.newPassword);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
+
 module.exports = {
   register,
   login,
@@ -58,4 +64,5 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  passwordChange,
 };

@@ -96,10 +96,19 @@ const verifyEmail = async (verifyEmailToken) => {
   }
 };
 
+const changePassword = async (user, password, newPassword) => {
+  if (await userService.isPasswordMatch(password, user)) {
+    await userService.updateUserById(user.id, { password: newPassword });
+    return user;
+  }
+  throw new ApiError(httpStatus.UNAUTHORIZED, 'Kullanıcı adı veya şifre hatalı');
+};
+
 module.exports = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
   resetPassword,
   verifyEmail,
+  changePassword,
 };
