@@ -53,14 +53,30 @@ model Monitor {
   isActiveByOwner    Boolean    @default(true)
   allowedStatusCodes String[]   @default(["200"])
   isProcess          Boolean    @default(false)
-
+  controlTime        DateTime   
+  notifications      Notification?     
   @@unique([userId, host])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+  emails Email[]
+  monitor Monitor @relation(fields: [monitorId], references: [id])
+  monitorId Int @unique
+}
+
+model Email {
+  id           Int      @id @default(autoincrement())
+  notificationId    Int
+  notification      Notification  @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  email String
 }
 
 model Maintanance {
   id Int @id @default(autoincrement())
   startTime DateTime
   endTime   DateTime
+  controlTime DateTime
   status Boolean
   monitor Monitor @relation(fields: [monitorId], references: [id])
   monitorId Int @unique

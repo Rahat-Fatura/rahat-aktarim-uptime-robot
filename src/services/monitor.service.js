@@ -7,6 +7,8 @@
 const axios = require('axios');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
+const { cronExprension } = require('../Jobs/utils/taskUtils');
+const prisma = require('../utils/database');
 const Monitor = require('../utils/database').monitor;
 
 /**
@@ -18,7 +20,9 @@ const createMonitor = async (monitorBody, user) => {
   if (await Monitor.findFirst({ where: { userId: user.id, host: monitorBody.host } })) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
   }
-  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } } });
+  const now = new Date();
+  const controlTime =  new Date(now.getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit));
+  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime });
   console.log("Create monitor:",monitorData);
   const monitor = await Monitor.create({ data: monitorData }); 
   console.log("Monitor created:",monitor);
@@ -49,7 +53,6 @@ const getMonitorById = async (monitorId, flag) => {
 };
 
 const updateMonitorById = async (monitorId, updateBody) => {
-  console.log("**************************************************");
   const monitor = await getMonitorById(monitorId,false);
   if (!monitor) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Sunucu bulunamadı');
@@ -87,12 +90,35 @@ const getMaintenance = async (user) => {
 }
 
 const runJob = async () => {
-  const monitors = await Monitor.findMany({
-    where: {
-      isActiveByOwner: true,
-      isProcess: true,
-    },
-  });
+  const monitors = await prisma.$transaction(async(tx)=>{
+    const toProcesses= await Monitor.findMany({
+      where:{
+        controlTime:{
+          lte: new Date()
+        },
+        isProcess: false,
+        isActiveByOwner: true
+      },
+      include:{
+        serverOwner:true,
+        maintanance: true
+      }
+    })
+
+    const ids = toProcesses.map(m=>m.id);
+
+    await tx.monitor.updateMany({
+      where:{
+        id: {in: ids}
+      },
+      data:{
+        isProcess: true
+      },
+    })
+
+    return toProcesses;
+  })
+
   return monitors;
 };
 

@@ -1,0 +1,12 @@
+version: "0.1"
+
+services:
+  app:
+    build: .
+    container_name: upTime-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev

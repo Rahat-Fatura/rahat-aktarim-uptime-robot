@@ -1,18 +1,5 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-use-before-define */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
-/* eslint-disable prettier/prettier */
-/* eslint-disable array-callback-return */
-/* eslint-disable no-console */
-/* eslint-disable prettier/prettier */
-/* eslint-disable prefer-const */
-/* eslint-disable import/newline-after-import */
-/* eslint-disable import/order */
 const { monitorTask } = require('./tasks/monitorTask');
 const { reportTask } = require('./tasks/reportTask');
-const { maintananceTask } = require('./tasks/maintananceTask');
 const { cronExprension, isoToCron } = require('./utils/taskUtils');
 const cron = require('node-cron');
 const { monitorService, maintananceService } = require('../services');

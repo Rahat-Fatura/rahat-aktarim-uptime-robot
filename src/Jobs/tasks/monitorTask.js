@@ -11,22 +11,19 @@
 /* eslint-disable no-use-before-define */
 const { monitorService, monitorLogService, emailService } = require('../../services');
 const axios = require('axios');
+const { cronExprension } = require('../utils/taskUtils');
 
 async function monitorTask(monitor) {
-  const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
-  const maintanance = controlMonitor.maintanance;
-  const user = controlMonitor.serverOwner;
-  if (maintanance && maintanance.status) {
-    monitor.status = 'maintanance';
-    monitor.isProcess = true;
-    await monitorService.updateMonitorById(monitor.id, monitor);
+  console.log("Monitor Task Çalışıyor !",monitor.name);
+  if (monitor.maintanance && monitor.maintanance.status) {
+    return;
   } else {
     const result = await sendRequest(monitor);
     if (!result.isError) {
-      if (controlMonitor.status === 'down' || controlMonitor.status === 'uncertain') {
+      if (monitor.status === 'down' || monitor.status === 'uncertain') {
         try {
           await emailService.sendEmail(
-            `<${user.email}>`,
+            `<${monitor.serverOwner.email}>`,
             `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
             `Sunucunuz çalışıyor ...
              HOST ADI: ${monitor.host}
@@ -38,23 +35,27 @@ async function monitorTask(monitor) {
         }
       }
       monitor.status = 'up';
-      monitor.isProcess = true;
+      monitor.isProcess = false;
+      const now = new Date();
+      monitor.controlTime = new Date(now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit));
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, monitor);
+      await monitorService.updateMonitorById(monitor.id, {status: monitor.status, isProcess: monitor.isProcess, controlTime: monitor.controlTime});
       // eslint-disable-next-line prettier/prettier, eqeqeq
     } else {
       await emailService.sendEmail(
-        `<${user.email}>`,
+        `<${monitor.serverOwner.email}>`,
         `Rahat Sistem Sunucu kontrollörü  ${monitor.method}`,
         `Sunucunuz çalışmıyor !!!
          HOST ADI: ${monitor.host}
           STATUS CODE: ${result.status}
           Message: ${result.message}`,
       );
-      monitor.isProcess = true;
+      monitor.isProcess = false;
       monitor.status = 'down';
+      const now = new Date();
+      monitor.controlTime = new Date(now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit));
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, monitor);
+      await monitorService.updateMonitorById(monitor.id, {status: monitor.status, isProcess: monitor.isProcess, controlTime: monitor.controlTime});
     }
   }
 }
@@ -62,6 +63,7 @@ async function monitorTask(monitor) {
 async function sendRequest(monitor) {
   const startTime = Date.now();
   let isError = false;
+  let status;
   try {
     const config = {
       method: monitor.method,
@@ -75,16 +77,20 @@ async function sendRequest(monitor) {
     const response = await axios(config);
     isError = !monitor.allowedStatusCodes.includes(response.status.toString());
     const responseTime = Date.now() - startTime;
-    return { status: response.status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
+    status = response.status;
+    return { status: status, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   } catch (error) {
     if (error.status) {
       isError = !monitor.allowedStatusCodes.includes(error.status.toString());
+      status = error.status;
     } else {
       isError = true;
     }
-    console.log('error', error);
+    //console.log('error', error);
+  }
+  finally{
     const responseTime = Date.now() - startTime;
-    return { status: error.status || 0, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
+    return { status: status || 0, responseTime, isError, message: isError ? 'unsuccess' : 'success' };
   }
 }
 

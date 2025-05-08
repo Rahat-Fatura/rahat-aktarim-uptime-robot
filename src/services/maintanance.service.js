@@ -14,7 +14,7 @@ const Maintanance = require('../utils/database').maintanance;
  */
 
 const createMaintanance = async (monitorId, monitorBody) => { 
-  const maintananceData = Object.assign(monitorBody, { monitorId: Number(monitorId), status: true });
+  const maintananceData = Object.assign(monitorBody, { controlTime: monitorBody.startTime, monitorId: Number(monitorId), status: true });
   console.log("Create maintanance:",maintananceData);
   const maintanance = await Maintanance.create({ data: maintananceData }); 
   console.log("Maintanance created:",maintanance);
@@ -54,25 +54,15 @@ const deleteMaintananceById = async (maintananceId) => {
 };
 
 const runMaintananceTask = async () => {
+  let nowDate= new Date();
+  nowDate.setSeconds(0);
+  nowDate.setMilliseconds(0);
   const maintanance = await Maintanance.findMany({
     where:{
-      startTime: {
-        gte: new Date(),
+      controlTime: {
+        lte: nowDate,
       },
-    }
-  });
-  return maintanance;
-}
-
-const runMaintananceJob = async () => {
-  const maintanance = await Maintanance.findMany({
-    where:{
-      startTime: {
-        lt: new Date(),
-      },
-      endTime: {
-        gte: new Date(),
-      },
+      status: true,
     }
   });
   return maintanance;
@@ -83,6 +73,5 @@ module.exports = {
     getMaintananceById,
     updateMaintananceById,
     deleteMaintananceById,
-    runMaintananceJob,
     runMaintananceTask,
 };

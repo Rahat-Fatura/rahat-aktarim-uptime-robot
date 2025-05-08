@@ -1,11 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prefer-const */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-nested-ternary */
-
 const dayjs = require('dayjs');
 
 function isoToCron(isoDate) {
@@ -23,7 +15,7 @@ function isoToCron(isoDate) {
 
   return `* ${minute} ${hour} ${day} ${month} *`;
 }
-
+/*
 const cronExprension = (time, timeUnit) => {
   const now = new Date();
   let hour = now.getHours();
@@ -40,7 +32,7 @@ const cronExprension = (time, timeUnit) => {
       if (time < 20) {
         time = 20;
       }
-      return `*/${time} * * * * *`;
+      return `*${time} * * * * *`;
     }
     case 'minutes': {
       if (time > 59) {
@@ -49,7 +41,7 @@ const cronExprension = (time, timeUnit) => {
       if (time < 1) {
         time = 1;
       }
-      return `0  */${time} * * * *`;
+      return `0  *${time} * * * *`;
     }
     case 'hours': {
       hour %= time;
@@ -68,7 +60,7 @@ const cronExprension = (time, timeUnit) => {
       if (time < 1) {
         return `0 ${minute} ${hour} * * *`;
       }
-      return `0 ${minute} ${hour} */${time} * *`;
+      return `0 ${minute} ${hour} *${time} * *`;
     }
     case 'weeks': {
       if (time > 4) {
@@ -77,7 +69,37 @@ const cronExprension = (time, timeUnit) => {
       if (time < 1) {
         time = 1;
       }
-      return `0 ${minute} ${hour} */${time * 7} * *`;
+      return `0 ${minute} ${hour} *${time * 7} * *`;
+    }
+  }
+};
+*/
+
+const cronExprension = (time, timeUnit) => {
+  switch (timeUnit) {
+    case 'seconds': {
+      if (time > 59) {
+        time = 59;
+      }
+      if (time < 20) {
+        time = 20;
+      }
+      return (time*10000);
+    }
+    case 'minutes': {
+      if (time > 59) {
+        time = 59;
+      }
+      if (time < 1) {
+        time = 1;
+      }
+      return (time*60*1000);
+    }
+    case 'hours': {
+      return (time*60*60*1000);
+    }
+    case 'days': {
+      return (time*60*24*60*1000);;
     }
   }
 };

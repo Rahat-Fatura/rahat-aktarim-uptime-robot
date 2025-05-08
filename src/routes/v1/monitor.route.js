@@ -74,18 +74,10 @@ router.put(
   monitorController.stopMaintanance,
 );
 
-router.put(
-  '/:monitorId/maintanance/task/cancel',
-  auth('getUsers'),
-  accessToMonitor(),
-  validate(monitorValidate.stopMaintananceJob), 
-  monitorController.cancelMaintananceTask,
-);
-
 router.get(
   '/maintanance',
   auth('getUsers'),
   monitorController.getMaintananceMonitor,
 );
 
-module.exports = router;
+module.exports = router; 
