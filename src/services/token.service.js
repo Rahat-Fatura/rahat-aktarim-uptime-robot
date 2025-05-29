@@ -25,6 +25,22 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   return jwt.sign(payload, secret);
 };
 
+const generateTokenForHeartBeat = (monitorId, secret = config.jwt.heartbeatCode) => {
+  const payload = {
+    sub: monitorId
+  };
+  return jwt.sign(payload, secret);
+};
+
+const verifyTokenForHeartBeat = (token) => {
+  try{
+    const payload = jwt.verify(token, config.jwt.heartbeatCode);
+    return payload;
+  }
+  catch(error){
+    throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
+  }
+};
 /**
  * Save a token
  * @param {string} token
@@ -122,4 +138,6 @@ module.exports = {
   generateAuthTokens,
   generateResetPasswordToken,
   generateVerifyEmailToken,
+  generateTokenForHeartBeat,
+  verifyTokenForHeartBeat,
 };

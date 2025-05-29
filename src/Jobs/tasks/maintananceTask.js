@@ -1,7 +1,7 @@
 const catchAsync = require("../../utils/catchAsync");
 const { maintananceService, monitorService } = require("../../services");
 
-const maintananceTasks = catchAsync(async (maintanance) => {
+const maintananceTask = catchAsync(async (maintanance) => {
   if (maintanance.endTime.getTime() <= new Date().getTime()) {
     await maintananceService.updateMaintananceById(maintanance.id, {
       controlTime: maintanance.startTime,
@@ -43,5 +43,5 @@ const maintananceTasks = catchAsync(async (maintanance) => {
 });
 
 module.exports = {
-  maintananceTasks,
+  maintananceTask,
 };

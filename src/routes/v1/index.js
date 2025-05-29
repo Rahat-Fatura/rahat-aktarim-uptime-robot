@@ -17,7 +17,7 @@ const defaultRoutes = [
     route: userRoute,
   },
   {
-    path: '/monitor',
+    path: '/monitors',
     route: monitorRoute,
   },
 ];

@@ -14,10 +14,11 @@ const Maintanance = require('../utils/database').maintanance;
  */
 
 const createMaintanance = async (monitorId, monitorBody) => { 
-  const maintananceData = Object.assign(monitorBody, { controlTime: monitorBody.startTime, monitorId: Number(monitorId), status: true });
+  console.log(monitorBody)
+  const maintananceData = Object.assign(monitorBody, { id: Number(monitorId), controlTime: monitorBody.startTime, status: true });
   console.log("Create maintanance:",maintananceData);
   const maintanance = await Maintanance.create({ data: maintananceData }); 
-  console.log("Maintanance created:",maintanance);
+  console.log("Maintanance created:",maintanance);  
   return maintanance;
 };
 

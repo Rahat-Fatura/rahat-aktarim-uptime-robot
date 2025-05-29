@@ -1,18 +1,4 @@
-/* eslint-disable no-empty */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable array-callback-return */
-/* eslint-disable no-param-reassign */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable prettier/prettier */
-/* eslint-disable prefer-const */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-unused-vars */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-console */
-/* eslint-disable prettier/prettier */
-/* eslint-disable camelcase */
-/* eslint-disable prettier/prettier */
+
 const { monitorService, monitorLogService, emailService } = require('../../services');
 
 function generateReport(logs) {

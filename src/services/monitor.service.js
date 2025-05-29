@@ -1,9 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-unused-vars */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-undef */
-/* eslint-disable no-console */
 const axios = require('axios');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
@@ -17,12 +11,9 @@ const Monitor = require('../utils/database').monitor;
  * @returns {Promise<User>}
  */
 const createMonitor = async (monitorBody, user) => { 
-  if (await Monitor.findFirst({ where: { userId: user.id, host: monitorBody.host } })) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
-  }
   const now = new Date();
   const controlTime =  new Date(now.getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit));
-  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime });
+  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime});
   console.log("Create monitor:",monitorData);
   const monitor = await Monitor.create({ data: monitorData }); 
   console.log("Monitor created:",monitor);
@@ -35,8 +26,51 @@ const getMonitor = async (user) => {
     monitor = await Monitor.findMany({ include: { logs: true } });
   } else {
     try {
-      monitor = await Monitor.findMany({ where: { serverOwner: { id: user.id } },
-         include: { logs: true },
+      monitor = await Monitor.findMany({
+        where: {
+           serverOwner: { id: user.id }
+        },
+        select: {
+          id: true,
+          name: true,
+          monitorType: true,
+          status: true,
+          isActiveByOwner: true,
+          httpMonitor: {
+            select: {
+              host: true,
+              method: true,
+            }
+          },
+          pingMonitor: {
+            select: {
+              host: true,
+            }
+          },
+          portMonitor: {
+            select: {
+              host: true,
+              port: true,
+            }
+          },
+          keyWordMonitor: {
+            select: {
+              host: true,
+              method: true,
+            }
+          },
+          cronJobMonitor: {
+            select: {
+              host: true,
+            }
+          },
+          logs: true
+        }
+      });
+      monitor = monitor.map(obj => {
+        return Object.fromEntries(
+           Object.entries(obj).filter(([key, value]) => value !== null)
+        );
       });
     }
     catch (error) {
@@ -47,8 +81,68 @@ const getMonitor = async (user) => {
   return monitor;
 };
 
-const getMonitorById = async (monitorId, flag) => {
-  const monitor = await Monitor.findUnique({ where: { id : Number(monitorId)}, include: { serverOwner: flag, maintanance: flag } });
+const getInstantMonitors = async (user) => {
+  let monitor;
+  if (user.role == 'admin') {
+    monitor = await Monitor.findMany({ include: { logs: true } });
+  } else {
+    try {
+      monitor = await Monitor.findMany({
+        where: {
+           serverOwner: { id: user.id }
+        },
+        select: {
+          id: true,
+          name: true,
+          httpMonitor: {
+            select: {
+              host: true,
+            }
+          },
+          pingMonitor: {
+            select: {
+              host: true,
+            }
+          },
+          portMonitor: {
+            select: {
+              host: true,
+            }
+          },
+          keyWordMonitor: {
+            select: {
+              host: true,
+            }
+          }
+        }
+      });
+       monitor = monitor.map(obj => {
+        const subMonitor = obj.httpMonitor || obj.pingMonitor || obj.portMonitor || obj.keyWordMonitor;
+        const host = subMonitor?.host || null;
+
+        const { httpMonitor, pingMonitor, portMonitor, keyWordMonitor, ...rest } = obj;
+
+        return {
+          ...rest,
+          host
+        };
+      });
+      /*monitor = monitor.map(obj => {
+        return Object.fromEntries(
+           Object.entries(obj).filter(([key, value]) => value !== null)
+        );
+      });*/
+    }
+    catch (error) {
+      console.log("Error fetching monitors:", error);
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Error fetching monitors');
+    }
+  }
+  return monitor;
+};
+
+const getMonitorById = async (id, flag) => {
+  const monitor = await Monitor.findUnique({ where: { id : Number(id)}, include: { serverOwner: flag, maintanance: flag } });
   return monitor;
 };
 
@@ -59,7 +153,7 @@ const updateMonitorById = async (monitorId, updateBody) => {
   }
   const newBody = updateBody;
   const monitorData = Object.assign(monitor, newBody);
-  const newMonitor = await Monitor.update({ where: { id: Number(monitorId) }, data: monitorData });
+  const newMonitor = await Monitor.update({ where: { id: Number(monitorId) }, data: updateBody });
   return newMonitor;
 };
  
@@ -72,10 +166,21 @@ const deleteMonitorById = async (deleteMonitorId) => {
   return monitor;
 };
 
+const getInstantControlMonitorById = async(id) =>{
+  const monitor = await Monitor.findUnique({ where: { id : Number(id)},
+   include: {
+      httpMonitor: true,
+      pingMonitor: true,
+      portMonitor: true,
+      keyWordMonitor: true,
+    } 
+  });
+  return monitor;
+}
+
 const getMaintenance = async (user) => {
   const monitor = await Monitor.findMany({ where: { serverOwner: { id: user.id }},
      select: { id: true,
-               host: true,
                name: true,
                status: true,
                maintanance:{
@@ -84,10 +189,150 @@ const getMaintenance = async (user) => {
                   endTime: true,
                   status: true,
                 }
-                } 
+                }  
               } });
   return monitor;
 }
+
+const getCronJobMonitorWithBody = async (id) => {
+  let cronJobMonitor;
+  try {
+    cronJobMonitor = await Monitor.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+            id: true,
+            cronJobMonitor: true,
+            serverOwner: {
+              select:{
+                email: true,
+              }
+            },
+            controlTime: true,
+            status: true,
+            isProcess: true,
+            interval: true,
+            intervalUnit: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return cronJobMonitor;
+};
+
+const getHttpMonitorWithBody = async (id) => {
+  let httpMonitor;
+  try {
+    httpMonitor = await Monitor.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+            id: true,
+            httpMonitor: true,
+            serverOwner: {
+              select:{
+                email: true,
+              }
+            },
+            controlTime: true,
+            status: true,
+            isProcess: true,
+            interval: true,
+            intervalUnit: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return httpMonitor;
+};
+
+const getPingMonitorWithBody = async (id) => {
+  let pingMonitor;
+  try {
+    pingMonitor = await Monitor.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+            id: true,
+            pingMonitor: true,
+            serverOwner: {
+              select:{
+                email: true,
+              }
+            },
+            controlTime: true,
+            status: true,
+            isProcess: true,
+            interval: true,
+            intervalUnit: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return pingMonitor;
+};
+
+const getPortMonitorWithBody = async (id) => {
+  let portMonitor;
+  try {
+    portMonitor = await Monitor.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+            id: true,
+            portMonitor: true,
+            serverOwner: {
+              select:{
+                email: true,
+              }
+            },
+            controlTime: true,
+            status: true,
+            isProcess: true,
+            interval: true,
+            intervalUnit: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return portMonitor;
+};
+
+const getKeyWordMonitorWithBody = async (id) => {
+  let keyWordMonitor;
+  try {
+    keyWordMonitor = await Monitor.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+            id: true,
+            keyWordMonitor: true,
+            serverOwner: {
+              select:{
+                email: true,
+              }
+            },
+            controlTime: true,
+            status: true,
+            isProcess: true,
+            interval: true,
+            intervalUnit: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  return keyWordMonitor;
+};
 
 const runJob = async () => {
   const monitors = await prisma.$transaction(async(tx)=>{
@@ -99,14 +344,14 @@ const runJob = async () => {
         isProcess: false,
         isActiveByOwner: true
       },
-      include:{
-        serverOwner:true,
-        maintanance: true
+      select:{
+        id: true,
+        monitorType: true,
       }
     })
-
+    
     const ids = toProcesses.map(m=>m.id);
-
+    
     await tx.monitor.updateMany({
       where:{
         id: {in: ids}
@@ -115,19 +360,26 @@ const runJob = async () => {
         isProcess: true
       },
     })
-
+    
     return toProcesses;
   })
-
+  
   return monitors;
 };
 
 module.exports = {
   createMonitor,
   getMonitor,
+  getInstantMonitors,
+  getInstantControlMonitorById,
   getMonitorById,
   updateMonitorById,
   deleteMonitorById,
   runJob,
-  getMaintenance
+  getMaintenance,
+  getCronJobMonitorWithBody,
+  getHttpMonitorWithBody,
+  getPingMonitorWithBody,
+  getPortMonitorWithBody,
+  getKeyWordMonitorWithBody
 };

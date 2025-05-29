@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
+  id              Int       @id @default(autoincrement()) 
   created_at      DateTime  @default(now())
   updated_at      DateTime  @default(now()) @updatedAt
   deleted_at      DateTime?
@@ -34,59 +34,110 @@ model User {
 model Monitor {
   id                 Int        @id @default(autoincrement())
   createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @default(now()) @updatedAt
-  deletedAt          DateTime?
+  monitorType        MonitorType
   name               String?
-  method             MethodType
-  host               String     
-  body               Json?
-  headers            Json?
+  httpMonitor        HttpMonitor?  
+  pingMonitor        PingMonitor?  
+  keyWordMonitor     KeyWordMonitor? 
+  portMonitor        PortMonitor?
+  cronJobMonitor     CronJobMonitor?  
   interval           Int        @default(5)
   intervalUnit       String     @default("minutes")
-  reportTime         Int        @default(1)
-  reportTimeUnit     String     @default("weeks")
+  reportTime         DateTime?
   status             Status     @default(uncertain)
   serverOwner        User       @relation(fields: [userId], references: [id])
   userId             Int
   logs               Log[]
   maintanance        Maintanance? 
   isActiveByOwner    Boolean    @default(true)
-  allowedStatusCodes String[]   @default(["200"])
   isProcess          Boolean    @default(false)
   controlTime        DateTime   
   notifications      Notification?     
+}
+
+model HttpMonitor {
+  id                 Int        @id 
+  host               String
+  method             MethodType     
+  body               Json?
+  headers            Json?
+  allowedStatusCodes String[]   @default([])
+  timeOut            Int        @default(30)
+  userId             Int   
+  monitor            Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
+  @@unique([userId, host, method])
+}
+
+model PingMonitor {
+  id   Int   @id
+  host       String
+  userId     Int
+  monitor    Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
   @@unique([userId, host])
 }
 
+model PortMonitor {
+  id   Int   @id 
+  host   String
+  port Int
+  timeOut    Int  @default(30)
+  userId   Int 
+  monitor    Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
+  @@unique([userId,host,port])
+}
+
+model KeyWordMonitor {
+  id                 Int        @id 
+  host               String
+  method             MethodType     
+  body               Json?
+  headers            Json?
+  allowedStatusCodes String[]    @default([])
+  keyWord            String
+  timeOut            Int        @default(30)
+  userId             Int
+  monitor            Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
+  @@unique([userId, host, method])
+}
+
+model CronJobMonitor {
+  id   Int @id
+  host String
+  token String
+  lastRequestTime DateTime?
+  devitionTime Int
+  userId  Int
+  monitor  Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
 model Notification {
-  id Int @id @default(autoincrement())
+  id Int          @id @default(autoincrement())
   emails Email[]
   monitor Monitor @relation(fields: [monitorId], references: [id])
-  monitorId Int @unique
+  monitorId Int   @unique
 }
 
 model Email {
-  id           Int      @id @default(autoincrement())
+  id                Int           @id @default(autoincrement())
   notificationId    Int
   notification      Notification  @relation(fields: [notificationId], references: [id], onDelete: Cascade)
   email String
 }
 
 model Maintanance {
-  id Int @id @default(autoincrement())
-  startTime DateTime
-  endTime   DateTime
+  id          Int     @id
+  startTime   DateTime
+  endTime     DateTime
   controlTime DateTime
-  status Boolean
-  monitor Monitor @relation(fields: [monitorId], references: [id])
-  monitorId Int @unique
+  status      Boolean
+  monitor     Monitor @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Log {
   id           Int      @id @default(autoincrement())
   monitorId    Int
   monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
-  statusCode   Int
+  status       String
   responseTime Int
   isError      Boolean
   createdAt    DateTime @default(now())
@@ -131,4 +182,12 @@ enum Status {
   down
   uncertain
   maintanance
+}
+
+enum MonitorType {
+  HttpMonitor
+  PingMonitor
+  PortMonitor
+  KeywordMonitor
+  CronJobMonitor
 }

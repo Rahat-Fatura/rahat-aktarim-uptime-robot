@@ -1,38 +1,43 @@
-/* eslint-disable prettier/prettier */
 const express = require('express');
 const auth = require('../../middlewares/auth');
-
 const router = express.Router();
 const monitorController = require('../../controllers/monitor.controller');
+const cronJobController = require('../../controllers/cronJobMonitor.controller');
 const validate = require('../../middlewares/validate');
-const { accessToMonitor } = require('../../middlewares/monitor');
+const { accessToMonitor, accessToCronJob } = require('../../middlewares/monitor');
 const monitorValidate = require('../../validations/monitor.validation');
 
-router.post('/', auth('getUsers'), validate(monitorValidate.createMonitor), monitorController.createMonitor);
+const httpMonitor = require("./monitorRoutes/httpMonitor.route");
+const pingMonitor = require("./monitorRoutes/pingMonitor.route");
+const keyWordMonitor = require("./monitorRoutes/keyWordMonitor.route");
+const portMonitor = require("./monitorRoutes/portMonitor.route");
+const cronJobMonitor = require("./monitorRoutes/cronJobMonitor.route");
+
+router.use('/http', auth('getUsers'), httpMonitor);
+router.use('/ping', auth('getUsers'), pingMonitor);
+router.use('/keyword', auth('getUsers'), keyWordMonitor);
+router.use('/port', auth('getUsers'), portMonitor);
+router.use('/cronjob', auth('getUsers'), cronJobMonitor);
+router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
 router.get('/', auth('getUsers'), monitorController.getMonitor);
+
 router.put(
-  '/:monitorId',
-  auth('getUsers'),
-  accessToMonitor(),
-  validate(monitorValidate.updateMonitor),
-  monitorController.updateMonitor,
-);
-router.put(
-  '/:monitorId/pause',
+  '/:id/pause',
   auth('getUsers'),
   accessToMonitor(),
   validate(monitorValidate.pauseMonitor),
   monitorController.pauseMonitor,
 );
+
 router.put(
-  '/:monitorId/play',
+  '/:id/play',
   auth('getUsers'),
   accessToMonitor(),
   validate(monitorValidate.playMonitor),
   monitorController.playMonitor,
 );
 router.delete(
-  '/:monitorId',
+  '/:id',
   auth('getUsers'),
   accessToMonitor(),
   validate(monitorValidate.deleteMonitor),
@@ -52,14 +57,14 @@ router.get(
 );
 
 router.get(
-  '/instant-Control/:monitorId',
+  '/instant-Control/:id',
   auth('getUsers'),
   accessToMonitor(),
   monitorController.sentRequestInstantControlMonitor,
 );
 
 router.post(
-  '/:monitorId/maintanance',
+  '/:id/maintanance',
   auth('getUsers'),
   accessToMonitor(),
   validate(monitorValidate.monitorMaintenance), 
@@ -67,7 +72,7 @@ router.post(
 );
 
 router.put(
-  '/:monitorId/maintanance/cancel',
+  '/:id/maintanance/cancel',
   auth('getUsers'),
   accessToMonitor(),
   validate(monitorValidate.stopMaintananceJob), 

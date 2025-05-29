@@ -1,7 +1,3 @@
-/* eslint-disable no-return-await */
-/* eslint-disable camelcase */
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const MonitorLog = require('../utils/database').log;
@@ -10,8 +6,8 @@ const createLog = async (monitor, result) => {
   await MonitorLog.create({
     data: {
       monitorId: monitor.id,
-      statusCode: result.status,
-      responseTime: result.responseTime,
+      status: monitor.status,
+      responseTime: result.responseTime || 0,
       isError: result.isError,
     },
   });

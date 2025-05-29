@@ -9,6 +9,9 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
     APP_URL: Joi.string().required().description('App url'),
+    JWT_HEARTBEAT_CODE: Joi.string().required().description('JWT heartbeat code'),
+    JWT_HEADER_STATIC_CODE: Joi.string().required().description('JWT header static code'),
+    HEARTBEAT_URL: Joi.string().required().description('Heartbeat url'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
@@ -36,6 +39,7 @@ module.exports = {
   port: envVars.PORT,
   app: {
     url: envVars.APP_URL,
+    heartbeatUrl: envVars.HEARTBEAT_URL,
   },
   jwt: {
     secret: envVars.JWT_SECRET,
@@ -43,6 +47,8 @@ module.exports = {
     refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
     resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+    heartbeatCode: envVars.JWT_HEARTBEAT_CODE,
+    headerStaticCode: envVars.JWT_HEADER_STATIC_CODE,
   },
   email: {
     mailgun: {

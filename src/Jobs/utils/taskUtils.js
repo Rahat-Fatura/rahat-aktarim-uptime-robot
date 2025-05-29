@@ -84,7 +84,7 @@ const cronExprension = (time, timeUnit) => {
       if (time < 20) {
         time = 20;
       }
-      return (time*10000);
+      return (time*1000);
     }
     case 'minutes': {
       if (time > 59) {
