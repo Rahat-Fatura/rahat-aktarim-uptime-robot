@@ -37,33 +37,44 @@ function generateReportCollective(monitors){
  
 async function reportTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
+  let beforeMonth = new Date(monitor.reportTime);
+  beforeMonth.setMonth(beforeMonth.getUTCMonth-1);
   const user = controlMonitor.serverOwner;
-  const maintanance = controlMonitor.maintanance;
-  if (maintanance && maintanance.status) { 
-  }else{
-    const logs = await monitorLogService.getLogsByTime(monitor.id, monitor.reportTime, monitor.reportTimeUnit);
-    const report = generateReport(logs);
-    const subject = `${monitor.name} için ${monitor.reportTime} ${monitor.reportTimeUnit} Raporunuz`;
-    const text = `
+  const logs = await monitorLogService.getLogsByTime(monitor.id);
+  const report = generateReport(logs);
+  console.log(report) 
+  const subject = `${monitor.name} için ${beforeMonth.toDateString()} ${monitor.reportTime} Raporunuz`;
+  const text = `
       Merhaba,
   
       İşte ${monitor.name} için son ${monitor.reportTime} ${monitor.reportTimeUnit} içindeki sunucu istek raporunuz:
   
-      - Toplam istek sayısı: ${report.totalRequests || 0}
-      - Başarılı istek sayısı: ${report.successRequests || 0}
-      - Hatalı istek sayısı: ${report.failedRequests || 0}
-      - İsteklerin ortalama yanıt süresi: ${report.avgResponseTime || 0} ms
-      - Başarı Oranı: ${report.successRate || '0.00%'}
+      - Toplam istek sayısı: ${report ? report.totalRequests : 0}
+      - Başarılı istek sayısı: ${report ? report.successRate : 0}
+      - Hatalı istek sayısı: ${report ? report.failedRequests : 0 }
+      - İsteklerin ortalama yanıt süresi: ${report ? report.avgResponseTime : 0} ms
+      - Başarı Oranı: ${report? report.successRate : '0.00%'} 
   
-      İyi günler dileriz!
+      İyi günler dileriz! 
     `;
-    await emailService.sendEmail(
+    console.log("Mail gönderildi ",text);
+    try{
+      await emailService.sendEmail(
       `<${user.email}>`,
       subject,
       text,
-    )
-  }
-
+      )
+    }
+    catch(error){
+      console.log(error)
+    }
+    
+    console.log("Helo")
+  let now = new Date();
+  now.setMonth(now.getUTCMonth());
+  await monitorService.updateMonitorById(monitor.id,{
+    reportTime: now
+  });
 }
 
 module.exports = {

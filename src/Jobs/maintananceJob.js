@@ -14,7 +14,7 @@ const maintananceJob = async () => {
       console.log("Maintanance Task job started");
       const maintanances = await maintananceService.runMaintananceTask();
       if(maintanances){
-        console.log(maintanances)
+       // console.log(maintanances)
         maintanances.map(maintanance =>{
             channel.sendToQueue("monitor_maintanance_queue", Buffer.from(JSON.stringify(maintanance)));
         })

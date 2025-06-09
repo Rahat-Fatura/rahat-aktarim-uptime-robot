@@ -12,8 +12,9 @@ const Monitor = require('../utils/database').monitor;
  */
 const createMonitor = async (monitorBody, user) => { 
   const now = new Date();
+  now.setMonth(now.getUTCMonth()+1);
   const controlTime =  new Date(now.getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit));
-  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime});
+  const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime, reportTime: now});
   console.log("Create monitor:",monitorData);
   const monitor = await Monitor.create({ data: monitorData }); 
   console.log("Monitor created:",monitor);
@@ -334,25 +335,39 @@ const getKeyWordMonitorWithBody = async (id) => {
   return keyWordMonitor;
 };
 
+const reportRender = async() =>{
+
+  const monitors = await Monitor.findMany({
+    where:{
+      reportTime:{
+         lte: new Date()
+      }
+    }
+  });
+
+  return monitors;
+}
+
 const runJob = async () => {
   const monitors = await prisma.$transaction(async(tx)=>{
+
     const toProcesses= await Monitor.findMany({
       where:{
         controlTime:{
           lte: new Date()
         },
-        isProcess: false,
+        isProcess: false, 
         isActiveByOwner: true
       },
       select:{
         id: true,
         monitorType: true,
+        isProcess: true
       }
-    })
-    
+    });
     const ids = toProcesses.map(m=>m.id);
-    
-    await tx.monitor.updateMany({
+
+    const monitors = await tx.monitor.updateMany({
       where:{
         id: {in: ids}
       },
@@ -361,11 +376,35 @@ const runJob = async () => {
       },
     })
     
-    return toProcesses;
-  })
+    const monitors2 = await tx.monitor.findMany({
+      where:{
+        controlTime:{
+          lte: new Date()
+        },
+        isProcess: true, 
+        isActiveByOwner: true
+      },
+      select:{
+        id: true,
+        monitorType: true,
+        isProcess: true
+      }
+    });
+  console.log("Monitors:", monitors2)
+  return toProcesses;
+  });
+  //console.log(monitors)
   
   return monitors;
 };
+
+const staytedsInQueue = async() =>{
+ await Monitor.updateMany({
+  data:{
+    isProcess: false
+  }
+ })
+}
 
 module.exports = {
   createMonitor,
@@ -375,11 +414,13 @@ module.exports = {
   getMonitorById,
   updateMonitorById,
   deleteMonitorById,
+  reportRender,
   runJob,
   getMaintenance,
   getCronJobMonitorWithBody,
   getHttpMonitorWithBody,
   getPingMonitorWithBody,
   getPortMonitorWithBody,
-  getKeyWordMonitorWithBody
+  getKeyWordMonitorWithBody,
+  staytedsInQueue
 };

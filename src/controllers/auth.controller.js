@@ -55,6 +55,12 @@ const passwordChange = catchAsync(async (req, res) => {
   res.send({ user, tokens });
 });
 
+const registerChange = catchAsync(async (req,res) => {
+  const user = await userService.updateUserById(req.user.id,req.body);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({user,tokens})
+})
+
 module.exports = {
   register,
   login,
@@ -65,4 +71,5 @@ module.exports = {
   sendVerificationEmail,
   verifyEmail,
   passwordChange,
+  registerChange
 };

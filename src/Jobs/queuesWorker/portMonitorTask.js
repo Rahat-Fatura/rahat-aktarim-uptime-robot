@@ -9,6 +9,7 @@ const portMonitorTask = async() =>{
         //await channel.deleteQueue(queueName);
         const assertion = await channel.assertQueue(queueName);
         channel.consume(queueName, monitor =>{
+            console.log(JSON.parse(monitor.content.toString()))
             channel.ack(monitor);
             portTask(JSON.parse(monitor.content.toString()));
         })

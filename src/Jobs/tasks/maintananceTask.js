@@ -1,46 +1,53 @@
-const catchAsync = require("../../utils/catchAsync");
 const { maintananceService, monitorService } = require("../../services");
 
-const maintananceTask = catchAsync(async (maintanance) => {
-  if (maintanance.endTime.getTime() <= new Date().getTime()) {
+const maintananceTask = async(maintanance) => {
+  console.log(new Date(maintanance.startTime).getTime());
+  console.log( new Date(maintanance.controlTime).getTime())
+  console.log(new Date(maintanance.startTime).getTime() === new Date(maintanance.controlTime).getTime())
+  console.log(new Date(maintanance.startTime) === new Date(maintanance.controlTime))
+  if (new Date(maintanance.endTime).getTime() <= new Date().getTime()) {
+    console.log("eNSON GELALİ YERİ")
     await maintananceService.updateMaintananceById(maintanance.id, {
       controlTime: maintanance.startTime,
       status: false,
     });
-    await monitorService.updateMonitorById(maintanance.monitorId, {
+    await monitorService.updateMonitorById(maintanance.id, {
       status: "uncertain",
-      isProcess: true,
+      isProcess: false,
     });
+    
   } 
   else {
     if (
       maintanance.status &&
-      maintanance.controlTime.getTime() == maintanance.endTime.getTime()
+      new Date(maintanance.controlTime).getTime() == new Date(maintanance.endTime).getTime()
     ) {
+      console.log("iKİNCİ GELMELEİ YERİ")
       await maintananceService.updateMaintananceById(maintanance.id, {
         controlTime: maintanance.startTime,
         status: false,
       });
-      await monitorService.updateMonitorById(maintanance.monitorId, {
+      await monitorService.updateMonitorById(maintanance.id, {
         status: "uncertain",
-        isProcess: true,
+        isProcess: false,
       });
     }
     if (
       maintanance.status &&
-      maintanance.startTime.getTime() == maintanance.controlTime.getTime()
+      new Date(maintanance.startTime).getTime() == new Date(maintanance.controlTime).getTime()
     ) {
+      console.log("ilkBURYA GELDE EJ NEJN EJNEJ N")
       await maintananceService.updateMaintananceById(maintanance.id, {
         status: true,
         controlTime: maintanance.endTime,
       });
-      await monitorService.updateMonitorById(maintanance.monitorId, {
+      await monitorService.updateMonitorById(maintanance.id, {
         status: "maintanance",
-        isProcess: false,
+        isProcess: true,
       });
     }
   }
-});
+};
 
 module.exports = {
   maintananceTask,
