@@ -1,12 +1,41 @@
-version: "0.1"
+version: '0.1'
 
 services:
   app:
     build: .
-    container_name: upTime-backend
+    container_name: upTimeRahat-backend
     ports:
       - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASS=${POSTGRES_PASSWORD}
     volumes:
-      - .:/app
-      - /app/node_modules
-    command: npm run dev
+      - ./app:/app
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${postgres}
+      POSTGRES_PASSWORD: ${1234}
+      POSTGRES_DB: ${upTimeRobot}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:

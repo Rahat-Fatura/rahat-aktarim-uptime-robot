@@ -10,6 +10,7 @@ const pingMonitorTask = async() =>{
         const assertion = await channel.assertQueue(queueName);
         channel.consume(queueName, monitor =>{
             channel.ack(monitor);
+            console.log(JSON.parse(monitor.content.toString()))
             pingTask(JSON.parse(monitor.content.toString()));
         })
     }

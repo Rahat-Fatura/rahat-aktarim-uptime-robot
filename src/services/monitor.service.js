@@ -13,7 +13,7 @@ const Monitor = require('../utils/database').monitor;
 const createMonitor = async (monitorBody, user) => { 
   const now = new Date();
   now.setMonth(now.getUTCMonth()+1);
-  const controlTime =  new Date(now.getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit));
+  const controlTime =  new Date(new Date().getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit));
   const monitorData = Object.assign(monitorBody, { serverOwner: { connect: { id: user.id } }, controlTime: controlTime, reportTime: now});
   console.log("Create monitor:",monitorData);
   const monitor = await Monitor.create({ data: monitorData }); 

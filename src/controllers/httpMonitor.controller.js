@@ -19,7 +19,6 @@ const getMonitor = catchAsync(async (req, res) => {
 });
 
 const updateMonitor = catchAsync(async (req, res) => {
-  console.log("Buraya kadar geldi")
   const updateData = req.body;
   let now = new Date();
   let monitorBody = await monitorService.getMonitorById(req.params.id);
