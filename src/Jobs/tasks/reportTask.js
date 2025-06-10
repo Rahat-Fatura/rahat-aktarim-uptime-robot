@@ -2,7 +2,13 @@
 const { monitorService, monitorLogService, emailService } = require('../../services');
 
 function generateReport(logs) {
-  if (logs.length === 0) return null;
+  if (logs.length === 0) return {
+    totalRequests: 0,
+    successRequests: 0,
+    failedRequests: 0,
+    avgResponseTime: 0,
+    successRate: `0%`,
+  };;
 
   const totalRequests = logs.length;
   const failedRequests = logs.filter((log) => log.isError).length;
