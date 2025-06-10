@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { pingMonitorService, monitorService } = require('../services');
-const { pingTask } = require('../Jobs/tasks/monitorTask');
+const { pingTask } = require('../Jobs/tasks/pingTask');
 const { cronExprension } = require('../Jobs/utils/taskUtils');
 const { pingMonitorTask } = require('../Jobs/queuesWorker/pingMonitorTask');
 
@@ -9,6 +9,7 @@ pingMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
   const monitor = await pingMonitorService.createPingMonitor(req.body,req.user);
+  pingTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
 

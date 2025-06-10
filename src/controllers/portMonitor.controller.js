@@ -3,11 +3,12 @@ const catchAsync = require('../utils/catchAsync');
 const { portMonitorService, monitorService } = require('../services');
 const { cronExprension } = require('../Jobs/utils/taskUtils');
 const { portMonitorTask } = require('../Jobs/queuesWorker/portMonitorTask');
-
+const { portTask } = require('../Jobs/tasks/portTask');
 portMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
   const monitor = await portMonitorService.createPortMonitor(req.body,req.user);
+  portTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
 

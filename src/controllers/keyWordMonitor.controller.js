@@ -3,11 +3,11 @@ const catchAsync = require('../utils/catchAsync');
 const { keyWordMonitorService, monitorService } = require('../services');
 const { cronExprension } = require('../Jobs/utils/taskUtils');
 const { keyWordMonitorTask } = require('../Jobs/queuesWorker/keyWordMonitorTask');
-
+const { keyWordTask } = require('../Jobs/tasks/keyWordTask');
 keyWordMonitorTask();
 const createMonitor = catchAsync(async (req, res) => {
-  console.log(req.body);
   const monitor = await keyWordMonitorService.createKeyWordMonitor(req.body,req.user);
+  keyWordTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
 
