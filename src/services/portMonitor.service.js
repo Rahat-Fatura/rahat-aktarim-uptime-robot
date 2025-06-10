@@ -38,6 +38,7 @@ const createPortMonitor = async(monitorBody,user) => {
             id: monitor.id,
             host: monitorBody.portMonitor.host,
             port: monitorBody.portMonitor.port,
+            timeOut: monitorBody.portMonitor.timeOut,
             userId: user.id,
         }
     })
