@@ -117,22 +117,21 @@ const getInstantMonitors = async (user) => {
           }
         }
       });
+      
        monitor = monitor.map(obj => {
         const subMonitor = obj.httpMonitor || obj.pingMonitor || obj.portMonitor || obj.keyWordMonitor;
         const host = subMonitor?.host || null;
 
         const { httpMonitor, pingMonitor, portMonitor, keyWordMonitor, ...rest } = obj;
-
+       
         return {
           ...rest,
           host
         };
       });
-      /*monitor = monitor.map(obj => {
-        return Object.fromEntries(
-           Object.entries(obj).filter(([key, value]) => value !== null)
-        );
-      });*/
+      console.log("Filter Before",monitor)
+      monitor = monitor.filter((obj) => obj.host!==null);
+      console.log("Filter After",monitor)
     }
     catch (error) {
       console.log("Error fetching monitors:", error);
