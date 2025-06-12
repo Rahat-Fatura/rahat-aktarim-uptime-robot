@@ -203,9 +203,12 @@ const getCronJobMonitorWithBody = async (id) => {
       },
       select: {
             id: true,
+            name: true,
+            monitorType: true,
             cronJobMonitor: true,
             serverOwner: {
               select:{
+                name: true,
                 email: true,
               }
             },
@@ -231,9 +234,12 @@ const getHttpMonitorWithBody = async (id) => {
       },
       select: {
             id: true,
+            name: true,
+            monitorType: true,
             httpMonitor: true,
             serverOwner: {
               select:{
+                name: true,
                 email: true,
               }
             },
@@ -259,9 +265,12 @@ const getPingMonitorWithBody = async (id) => {
       },
       select: {
             id: true,
+            name: true,
+            monitorType: true,
             pingMonitor: true,
             serverOwner: {
               select:{
+                name: true,
                 email: true,
               }
             },
@@ -287,9 +296,12 @@ const getPortMonitorWithBody = async (id) => {
       },
       select: {
             id: true,
+            name: true,
+            monitorType: true,
             portMonitor: true,
             serverOwner: {
               select:{
+                name: true,
                 email: true,
               }
             },
@@ -315,9 +327,12 @@ const getKeyWordMonitorWithBody = async (id) => {
       },
       select: {
             id: true,
+            name: true,
+            monitorType: true,
             keyWordMonitor: true,
             serverOwner: {
               select:{
+                name: true,
                 email: true,
               }
             },

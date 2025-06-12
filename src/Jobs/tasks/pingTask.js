@@ -17,11 +17,18 @@ const pingTask = async (monitor) => {
         try {
           await emailService.sendEmail(
             `<${monitor.serverOwner.email}>`,
-            `Rahat Sistem Sunucu kontrollörü  ${keyWordMonitor.method}`,
-            `Sunucunuz çalışıyor ...
-             HOST ADI: ${monitor.host}
-             STATUS CODE: ${result.status}
-             Message: ${result.message}`
+            `Monitor is UP. ${monitor.monitorType} on IP: ${pingMonitor.host}`,
+            `Merhaba ${monitor.serverOwner.name},
+            Rahat Up izleme sistemine eklediğiniz servisine erişim denemesi başarıyla sonuçlandı.
+            📌 Servis Bilgileri:
+                Servis Adı: ${monitor.name}
+                Durum: ✅ Erişilebilir (UP)
+                Kontrol Zamanı: ${new Date(monitor.controlTime)}
+                Yanıt Süresi: ${result.responseTime}ms
+                Servisiniz izleme kapsamına alınmıştır. Bundan sonraki erişim durumlarıyla ilgili gelişmelerde size bilgi vermeye devam edeceğiz.
+                Yardım veya sorularınız için bize +90542 315 88 12 numara üzerinden ulaşabilirsiniz.
+                Saygılarımızla,
+                Rahat Up Ekibi`
           );
         } catch (error) {}
       }
@@ -39,16 +46,27 @@ const pingTask = async (monitor) => {
         controlTime: monitor.controlTime,
       });
     } else {
-      try {
-        await emailService.sendEmail(
-          `<${monitor.serverOwner.email}>`,
-          `Rahat Sistem Sunucu kontrollörü  ${keyWordMonitor.method}`,
-          `Sunucunuz çalışıyor ...
-             HOST ADI: ${monitor.host}
-             STATUS CODE: ${result.status}
-             Message: ${result.message}`
-        );
-      } catch (error) {}
+      if (monitor.status === "up" || monitor.status === "uncertain") {
+        try {
+          await emailService.sendEmail(
+            `<${monitor.serverOwner.email}>`,
+            `Monitor is DOWN. ${monitor.monitorType} on IP: ${pingMonitor.host}`,
+            `Merhaba ${monitor.serverOwner.name},
+            Rahat Up izleme sistemimiz, aşağıdaki servisinize şu anda erişim sağlanamadığını tespit etti:
+            📌 Servis Bilgileri:
+                Servis Adı: ${monitor.name}
+                Durum: ❌ Erişim Yok (DOWN)
+                Kontrol Zamanı: ${new Date(monitor.controlTime)}
+                Yanıt Süresi: ${result.responseTime}ms 
+                Erişim problemi devam ettiği sürece izleme yapılmaya devam edilecektir.
+                Servis yeniden erişilebilir olduğunda tarafınıza tekrar bilgilendirme yapılacaktır.
+                Yardım veya sorularınız için bize +90542 315 88 12 numara üzerinden ulaşabilirsiniz.
+                Saygılarımızla,
+                Rahat Up Ekibi`
+          );
+        } catch (error) {}
+      }
+
       monitor.isProcess = false;
       monitor.status = "down";
       const now = new Date();
@@ -110,5 +128,5 @@ async function sendPing(monitor) {
 
 module.exports = {
   pingTask,
-  sendPing
+  sendPing,
 };
