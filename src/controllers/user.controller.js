@@ -1,15 +1,17 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService } = require('../services');
+const { userService, tokenService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
+  const tokens = await tokenService.generateAuthTokens(user);
   res.status(httpStatus.CREATED).send(user);
 });
 
 const getUsers = catchAsync(async (req, res) => {
   const result = await userService.getUsersList();
+  console.log(result);
   res.send(result);
 });
 

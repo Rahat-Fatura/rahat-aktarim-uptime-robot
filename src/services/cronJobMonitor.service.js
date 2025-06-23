@@ -9,7 +9,7 @@ const {
 } = require("./token.service");
 const { cronExprension } = require("../Jobs/utils/taskUtils");
 
-const createCronJobMonitor = async (monitorBody, user) => {
+const createCronJobMonitor = async (monitorBody, userId) => {
   let controlTime;
   let cronJobMonitor;
   let monitor;
@@ -20,7 +20,7 @@ const createCronJobMonitor = async (monitorBody, user) => {
     intervalUnit: monitorBody.intervalUnit,
   };
   try {
-    monitor = await monitorService.createMonitor(body, user);
+    monitor = await monitorService.createMonitor(body, userId);
     controlTime = new Date(
       monitor.controlTime.getTime() +
         cronExprension(monitorBody.cronJobMonitor.devitionTime, "minutes")
@@ -37,7 +37,7 @@ const createCronJobMonitor = async (monitorBody, user) => {
         host: url,
         token: token,
         devitionTime: monitorBody.cronJobMonitor.devitionTime,
-        userId: user.id,
+        userId: Number(userId),
       },
     });
   } catch (error) {

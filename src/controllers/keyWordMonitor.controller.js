@@ -5,8 +5,15 @@ const { cronExprension } = require('../Jobs/utils/taskUtils');
 const { keyWordMonitorTask } = require('../Jobs/queuesWorker/keyWordMonitorTask');
 const { keyWordTask } = require('../Jobs/tasks/keyWordTask');
 keyWordMonitorTask();
+
 const createMonitor = catchAsync(async (req, res) => {
-  const monitor = await keyWordMonitorService.createKeyWordMonitor(req.body,req.user);
+  const monitor = await keyWordMonitorService.createKeyWordMonitor(req.body,req.user.id);
+  keyWordTask(monitor);
+  res.status(httpStatus.CREATED).send(monitor);
+});
+
+const adminCreateMonitor = catchAsync(async (req, res) => {
+  const monitor = await keyWordMonitorService.createKeyWordMonitor(req.body,req.params.userId);
   keyWordTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
@@ -38,4 +45,5 @@ module.exports = {
   createMonitor,
   getMonitor,
   updateMonitor,
+  adminCreateMonitor,
 };

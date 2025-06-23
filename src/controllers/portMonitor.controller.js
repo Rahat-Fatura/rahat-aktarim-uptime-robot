@@ -7,7 +7,13 @@ const { portTask } = require('../Jobs/tasks/portTask');
 portMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
-  const monitor = await portMonitorService.createPortMonitor(req.body,req.user);
+  const monitor = await portMonitorService.createPortMonitor(req.body,req.user.id);
+  portTask(monitor);
+  res.status(httpStatus.CREATED).send(monitor);
+});
+
+const adminCreateMonitor = catchAsync(async (req, res) => {
+  const monitor = await portMonitorService.createPortMonitor(req.body,req.params.userId);
   portTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
@@ -40,4 +46,5 @@ module.exports = {
   createMonitor,
   getMonitor,
   updateMonitor,
+  adminCreateMonitor,
 };

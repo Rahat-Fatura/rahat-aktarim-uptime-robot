@@ -13,6 +13,7 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
     const hasRequiredRights = requiredRights.every((requiredRight) => userRights.includes(requiredRight));
     // eslint-disable-next-line eqeqeq
     if (!hasRequiredRights && req.params.userId != user.id) {
+      console.log('Buraya geldiiiii');
       return reject(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
     }
   }

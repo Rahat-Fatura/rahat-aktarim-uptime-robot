@@ -31,7 +31,16 @@ const createMonitor = catchAsync(async (req, res) => {
 });
 
 const getMonitor = catchAsync(async (req, res) => {
-  const monitors = await monitorService.getMonitor(req.user);
+  const monitors = await monitorService.getMonitor(req.user.id);
+  monitors.map(monitor =>{
+    monitor.successRate = generateReport(monitor.logs)?generateReport(monitor.logs).successRate:'0%';
+    delete monitor.logs;
+  }) 
+  res.status(httpStatus.OK).send(monitors);
+});
+
+const getUserMonitors = catchAsync(async (req, res) => {
+  const monitors = await monitorService.getMonitor(req.params.userId);
   monitors.map(monitor =>{
     monitor.successRate = generateReport(monitor.logs)?generateReport(monitor.logs).successRate:'0%';
     delete monitor.logs;
@@ -65,19 +74,19 @@ const playMonitor = catchAsync(async (req, res) => {
 
 const getMonitorWithLogs = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.user);
-  
   if (!monitors) {
     throw new Error('Monitor not found');
   }
-  if (monitors.isActiveByOwner) {
-    throw new Error('Monitor is active');
-  }
-  if (monitors.isActiveByOwner === null) {
-    throw new Error('Monitor is not active');
-  }
-
   const report= generateReportCollective(monitors);
+  res.status(httpStatus.OK).send(report);
+});
 
+const getMonitorWithLogsForAdmin = catchAsync(async (req, res) => {
+  const monitors = await monitorService.getMonitor(req.params.userId);
+  if (!monitors) {
+    throw new Error('Monitor not found');
+  }
+  const report= generateReportCollective(monitors);
   res.status(httpStatus.OK).send(report);
 });
 
@@ -127,7 +136,15 @@ const sentRequestInstantControlMonitor = catchAsync(async (req, res) =>  {
 });
 
 const getMaintananceMonitor = catchAsync(async (req, res) => {
-  let monitors = await monitorService.getMaintenance(req.user);
+  let monitors = await monitorService.getMaintenance(req.user.id);
+  if (!monitors) {
+    throw new Error('Monitor not found');
+  }
+  res.status(httpStatus.OK).send(monitors);
+});
+
+const getAdminMaintananceMonitor = catchAsync(async (req, res) => {
+  let monitors = await monitorService.getMaintenance(req.params.userId);
   if (!monitors) {
     throw new Error('Monitor not found');
   }
@@ -220,4 +237,7 @@ module.exports = {
   getMaintananceMonitor,
   createMaintananceMonitor,
   stopMaintanance,
+  getUserMonitors,
+  getAdminMaintananceMonitor,
+  getMonitorWithLogsForAdmin,
 };

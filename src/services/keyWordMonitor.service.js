@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 const he = require('he');
 
-const createKeyWordMonitor = async(monitorBody,user) =>{
+const createKeyWordMonitor = async(monitorBody,userId) =>{
   let keyWordMonitor;
   let monitor;
   const body = {
@@ -20,7 +20,7 @@ const createKeyWordMonitor = async(monitorBody,user) =>{
           host: monitorBody.keyWordMonitor.host,
         },
         {
-          userId: user.id
+          userId: Number(userId)
         },
         {
           method: monitorBody.keyWordMonitor.method
@@ -31,7 +31,7 @@ const createKeyWordMonitor = async(monitorBody,user) =>{
   if(keyWordMonitor){
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adresi daha önce alınmış');
   }
-  monitor = await monitorService.createMonitor(body,user);
+  monitor = await monitorService.createMonitor(body,userId);
   try{
     keyWordMonitor = await KeyWordMonitor.create({
       data:{
@@ -42,7 +42,7 @@ const createKeyWordMonitor = async(monitorBody,user) =>{
         headers: monitorBody.keyWordMonitor.headers,
         allowedStatusCodes: monitorBody.keyWordMonitor.allowedStatusCodes,
         keyWord: he.decode(monitorBody.keyWordMonitor.keyWord),
-        userId: user.id,
+        userId: Number(userId),
       }
     })
   }

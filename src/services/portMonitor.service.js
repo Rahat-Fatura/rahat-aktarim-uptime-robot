@@ -4,7 +4,7 @@ const { port } = require("../config/config");
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 
-const createPortMonitor = async(monitorBody,user) => {
+const createPortMonitor = async(monitorBody,userId) => {
   let portMonitor;
   let monitor;
   const body = {
@@ -20,7 +20,7 @@ const createPortMonitor = async(monitorBody,user) => {
           host: monitorBody.portMonitor.host,
         },
         {
-          userId: user.id
+          userId: Number(userId)
         },
         {
           port: monitorBody.portMonitor.port
@@ -31,7 +31,7 @@ const createPortMonitor = async(monitorBody,user) => {
   if(portMonitor){
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
   }
-  monitor = await monitorService.createMonitor(body,user);
+  monitor = await monitorService.createMonitor(body, userId);
   try{
     portMonitor = await PortMonitor.create({
         data:{
@@ -39,7 +39,7 @@ const createPortMonitor = async(monitorBody,user) => {
             host: monitorBody.portMonitor.host,
             port: monitorBody.portMonitor.port,
             timeOut: monitorBody.portMonitor.timeOut,
-            userId: user.id,
+            userId: Number(userId),
         }
     })
   }

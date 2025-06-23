@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const { monitorService, tokenService } = require('../services');
+const { monitorService, tokenService, userService } = require('../services');
 const catchAsync = require('../utils/catchAsync');
 const config = require('../config/config');
 
@@ -8,10 +8,14 @@ const config = require('../config/config');
 const accessToMonitor =()=>catchAsync(async (req, res, next) => {
   console.log(req.body)
   const monitor = await monitorService.getMonitorById(req.params.id,false);
-  if (monitor.userId !== req.user.id) {
+  const user= await userService.getUserById(req.user.id);
+  if (monitor.userId == user.id || user.role == 'admin') {
+    next();
+  }
+  else{
     return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
   }
-  next();
+  
 });
 
 const accessToCronJob =()=>catchAsync(async (req, res, next) => {

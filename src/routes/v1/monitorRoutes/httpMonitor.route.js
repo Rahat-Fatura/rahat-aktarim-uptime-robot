@@ -8,7 +8,7 @@ const { accessToMonitor } = require('../../../middlewares/monitor');
 router.post("/", validate(httpValidate.createMonitor),monitorController.createMonitor);
 router.put("/:id", accessToMonitor(), validate(httpValidate.updateMonitor), monitorController.updateMonitor);
 router.get("/:id", accessToMonitor(), validate(httpValidate.getMonitor), monitorController.getMonitor);
-
+router.post("/:userId", validate(httpValidate.createMonitor),monitorController.adminCreateMonitor);
 
 
 module.exports = router;

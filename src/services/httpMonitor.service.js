@@ -3,7 +3,7 @@ const HttpMonitor = require("../utils/database").httpMonitor
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 
-const createHttpMonitor = async(monitorBody,user) =>{
+const createHttpMonitor = async(monitorBody,userId) =>{
   let httpMonitor;
   let monitor;
   const body = {
@@ -19,7 +19,7 @@ const createHttpMonitor = async(monitorBody,user) =>{
           host: monitorBody.httpMonitor.host,
         },
         {
-          userId: user.id
+          userId: Number(userId)
         },
         {
           method: monitorBody.httpMonitor.method
@@ -31,7 +31,7 @@ const createHttpMonitor = async(monitorBody,user) =>{
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adresi daha önce alınmış');
   }
   try{
-    monitor = await monitorService.createMonitor(body,user);
+    monitor = await monitorService.createMonitor(body,userId);
     httpMonitor = await HttpMonitor.create({
       data:{
         id: monitor.id,
@@ -41,7 +41,7 @@ const createHttpMonitor = async(monitorBody,user) =>{
         headers: monitorBody.httpMonitor.headers,
         allowedStatusCodes: monitorBody.httpMonitor.allowedStatusCodes,
         timeOut: monitorBody.httpMonitor.timeOut || 30,
-        userId: user.id,
+        userId: Number(userId),
       }
     })
   }

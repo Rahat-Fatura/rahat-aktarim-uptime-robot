@@ -8,7 +8,13 @@ const { pingMonitorTask } = require('../Jobs/queuesWorker/pingMonitorTask');
 pingMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
-  const monitor = await pingMonitorService.createPingMonitor(req.body,req.user);
+  const monitor = await pingMonitorService.createPingMonitor(req.body,req.user.id);
+  pingTask(monitor);
+  res.status(httpStatus.CREATED).send(monitor);
+});
+
+const adminCreateMonitor = catchAsync(async (req, res) => {
+  const monitor = await pingMonitorService.createPingMonitor(req.body,req.params.userId);
   pingTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
@@ -40,4 +46,5 @@ module.exports = {
   createMonitor,
   getMonitor,
   updateMonitor,
+  adminCreateMonitor,
 };

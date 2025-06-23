@@ -3,7 +3,7 @@ const PingMonitor = require("../utils/database").pingMonitor
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 
-const createPingMonitor = async(monitorBody,user) => {
+const createPingMonitor = async(monitorBody,userId) => {
   let pingMonitor;
   let monitor;
   const body = {
@@ -19,7 +19,7 @@ const createPingMonitor = async(monitorBody,user) => {
           host: monitorBody.pingMonitor.host,
         },
         {
-          userId: user.id
+          userId: Number(userId)
         }
       ]
     }
@@ -27,13 +27,13 @@ const createPingMonitor = async(monitorBody,user) => {
   if(pingMonitor){
     throw new ApiError(httpStatus.BAD_REQUEST, 'host adres daha önce alınmış');
   }
-  monitor = await monitorService.createMonitor(body,user);
+  monitor = await monitorService.createMonitor(body,userId);
   try{
     pingMonitor = await PingMonitor.create({
         data:{
             id: monitor.id,
             host: monitorBody.pingMonitor.host,
-            userId: user.id,
+            userId: Number(userId),
         }
     })
   }

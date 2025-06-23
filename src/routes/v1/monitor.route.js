@@ -20,7 +20,7 @@ router.use('/port', auth('getUsers'), portMonitor);
 router.use('/cronjob', auth('getUsers'), cronJobMonitor);
 router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
 router.get('/', auth('getUsers'), monitorController.getMonitor);
-
+router.get('/:userId', auth('manageUsers'), monitorController.getUserMonitors);
 router.put(
   '/:id/pause',
   auth('getUsers'),
@@ -48,6 +48,12 @@ router.get(
   '/logs',
   auth('getUsers'),
   monitorController.getMonitorWithLogs,
+);
+
+router.get(
+  '/logs/:userId',
+  auth('manageUsers'),
+  monitorController.getMonitorWithLogsForAdmin,
 );
 
 router.get(
@@ -83,6 +89,12 @@ router.get(
   '/maintanance',
   auth('getUsers'),
   monitorController.getMaintananceMonitor,
+);
+
+router.get(
+  '/maintanance/:userId',
+  auth('manageUsers'),
+  monitorController.getAdminMaintananceMonitor,
 );
 
 module.exports = router; 

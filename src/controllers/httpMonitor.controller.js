@@ -8,7 +8,13 @@ const { httpMonitorTask } = require('../Jobs/queuesWorker/httpMonitorTask');
 httpMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
-  const monitor = await httpMonitorService.createHttpMonitor(req.body,req.user);
+  const monitor = await httpMonitorService.createHttpMonitor(req.body,req.user.id);
+  monitorTask(monitor);
+  res.status(httpStatus.CREATED).send(monitor);
+});
+
+const adminCreateMonitor = catchAsync(async (req, res) => {
+  const monitor = await httpMonitorService.createHttpMonitor(req.body,req.params.userId);
   monitorTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
@@ -40,4 +46,5 @@ module.exports = {
   createMonitor,
   getMonitor,
   updateMonitor,
+  adminCreateMonitor,
 };

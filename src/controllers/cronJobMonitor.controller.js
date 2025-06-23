@@ -8,9 +8,15 @@ const { cronJobMonitorTask } = require('../Jobs/queuesWorker/cronJobMonitorTask'
 cronJobMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
-  const monitor = await cronJobMonitorService.createCronJobMonitor(req.body,req.user);
+  const monitor = await cronJobMonitorService.createCronJobMonitor(req.body,req.user.id);
   res.status(httpStatus.CREATED).send(monitor);
 });
+
+const adminCreateMonitor = catchAsync(async (req, res) => {
+  const monitor = await cronJobMonitorService.createCronJobMonitor(req.body,req.params.userId);
+  res.status(httpStatus.CREATED).send(monitor);
+});
+
 
 const getMonitor = catchAsync(async (req, res) => {
   const monitor = await cronJobMonitorService.getCronJobMonitorFullDataById(req.params.id);
@@ -72,5 +78,6 @@ module.exports = {
   createMonitor,
   getMonitor,
   updateMonitor,
-  cronJobMonitor
+  cronJobMonitor,
+  adminCreateMonitor,
 };

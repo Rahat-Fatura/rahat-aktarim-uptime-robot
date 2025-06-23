@@ -8,6 +8,6 @@ const { accessToMonitor, accessToCronJob } = require('../../../middlewares/monit
 router.post("/", validate(cronJobValidate.createMonitor), monitorController.createMonitor);
 router.put("/:id", validate(cronJobValidate.updateMonitor),  accessToMonitor(), monitorController.updateMonitor);
 router.get("/:id", validate(cronJobValidate.getMonitor), accessToMonitor(), monitorController.getMonitor);
-
+router.post("/:userId", validate(cronJobValidate.createMonitor), monitorController.adminCreateMonitor);
 
 module.exports = router;
