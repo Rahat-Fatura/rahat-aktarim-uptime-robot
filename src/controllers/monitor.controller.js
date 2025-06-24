@@ -73,7 +73,7 @@ const playMonitor = catchAsync(async (req, res) => {
 });
 
 const getMonitorWithLogs = catchAsync(async (req, res) => {
-  const monitors = await monitorService.getMonitor(req.user);
+  const monitors = await monitorService.getMonitor(req.user.id);
   if (!monitors) {
     throw new Error('Monitor not found');
   }

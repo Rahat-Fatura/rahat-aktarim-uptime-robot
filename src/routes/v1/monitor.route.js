@@ -13,47 +13,10 @@ const keyWordMonitor = require("./monitorRoutes/keyWordMonitor.route");
 const portMonitor = require("./monitorRoutes/portMonitor.route");
 const cronJobMonitor = require("./monitorRoutes/cronJobMonitor.route");
 
-router.use('/http', auth('getUsers'), httpMonitor);
-router.use('/ping', auth('getUsers'), pingMonitor);
-router.use('/keyword', auth('getUsers'), keyWordMonitor);
-router.use('/port', auth('getUsers'), portMonitor);
-router.use('/cronjob', auth('getUsers'), cronJobMonitor);
-router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
-router.get('/', auth('getUsers'), monitorController.getMonitor);
-router.get('/:userId', auth('manageUsers'), monitorController.getUserMonitors);
-router.put(
-  '/:id/pause',
-  auth('getUsers'),
-  accessToMonitor(),
-  validate(monitorValidate.pauseMonitor),
-  monitorController.pauseMonitor,
-);
-
-router.put(
-  '/:id/play',
-  auth('getUsers'),
-  accessToMonitor(),
-  validate(monitorValidate.playMonitor),
-  monitorController.playMonitor,
-);
-router.delete(
-  '/:id',
-  auth('getUsers'),
-  accessToMonitor(),
-  validate(monitorValidate.deleteMonitor),
-  monitorController.deleteMonitor,
-);
-
 router.get(
   '/logs',
   auth('getUsers'),
   monitorController.getMonitorWithLogs,
-);
-
-router.get(
-  '/logs/:userId',
-  auth('manageUsers'),
-  monitorController.getMonitorWithLogsForAdmin,
 );
 
 router.get(
@@ -89,6 +52,44 @@ router.get(
   '/maintanance',
   auth('getUsers'),
   monitorController.getMaintananceMonitor,
+);
+
+
+router.use('/http', auth('getUsers'), httpMonitor);
+router.use('/ping', auth('getUsers'), pingMonitor);
+router.use('/keyword', auth('getUsers'), keyWordMonitor);
+router.use('/port', auth('getUsers'), portMonitor);
+router.use('/cronjob', auth('getUsers'), cronJobMonitor);
+router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
+router.get('/', auth('getUsers'), monitorController.getMonitor);
+router.get('/:userId', auth('manageUsers'), monitorController.getUserMonitors);
+router.put(
+  '/:id/pause',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.pauseMonitor),
+  monitorController.pauseMonitor,
+);
+
+router.put(  
+  '/:id/play',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.playMonitor),
+  monitorController.playMonitor,
+);
+router.delete(
+  '/:id',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.deleteMonitor),
+  monitorController.deleteMonitor,
+);
+
+router.get(
+  '/logs/:userId',
+  auth('manageUsers'),
+  monitorController.getMonitorWithLogsForAdmin,
 );
 
 router.get(

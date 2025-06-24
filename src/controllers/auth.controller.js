@@ -3,6 +3,14 @@ const catchAsync = require('../utils/catchAsync');
 const logger = require('../config/logger');
 const { authService, userService, tokenService, emailService } = require('../services');
 
+const getMe = catchAsync(async (req, res) => {
+  const user = await userService.getUserById(req.user.id);
+  if (!user) {
+    return res.status(httpStatus.NOT_FOUND).send({ message: 'Kullanıcı bulunamadı' });
+  }
+  res.status(httpStatus.CREATED).send({ user });
+});
+
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
@@ -71,5 +79,6 @@ module.exports = {
   sendVerificationEmail,
   verifyEmail,
   passwordChange,
-  registerChange
+  registerChange,
+  getMe,
 };
