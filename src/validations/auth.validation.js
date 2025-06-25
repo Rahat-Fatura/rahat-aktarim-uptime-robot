@@ -58,8 +58,9 @@ const passwordChange = {
 
 const registerChange = {
   body: Joi.object().keys({
-    name: Joi.string().required(),
-    email: Joi.string().required().email(),
+    name: Joi.string(),
+    email: Joi.string().email(),
+    password: Joi.string().custom(password),
   }),
 };
 

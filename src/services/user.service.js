@@ -52,6 +52,10 @@ const updateUserById = async (userId, updateBody) => {
   if (newBody.email && (await User.findFirst({ where: { email: newBody.email, NOT: { id: userId } } }))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'e-Posta daha önce alınmış');
   }
+  if(newBody.email != await getUserById(userId).email) {
+    console.log('Email buraya geldi');
+    newBody.isEmailVerified = false; // Reset email verification if email is changed
+  }
   if (newBody.password) {
     newBody.password = await bcrypt.hash(newBody.password, 8);
   }

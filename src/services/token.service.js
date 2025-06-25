@@ -26,7 +26,8 @@ const generateToken = (userId, role, expires, type, secret = config.jwt.secret) 
   return jwt.sign(payload, secret);
 };
 
-const generateTokenForHeartBeat = (monitorId, secret = config.jwt.heartbeatCode) => {
+const generateTokenForHeartBeat = (monitorId, 
+  secret = config.jwt.heartbeatCode) => {
   const payload = {
     sub: monitorId
   };
@@ -127,7 +128,7 @@ const generateResetPasswordToken = async (email) => {
  */
 const generateVerifyEmailToken = async (user) => {
   const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateToken(user.id, expires, tokenTypes.VERIFY_EMAIL);
+  const verifyEmailToken = generateToken(user.id, user.role, expires, tokenTypes.VERIFY_EMAIL);
   await saveToken(verifyEmailToken, user.id, expires, tokenTypes.VERIFY_EMAIL);
   return verifyEmailToken;
 };
