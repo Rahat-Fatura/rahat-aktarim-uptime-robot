@@ -116,7 +116,7 @@ const generateResetPasswordToken = async (email) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı');
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);
+  const resetPasswordToken = generateToken(user.id, user.role, expires, tokenTypes.RESET_PASSWORD);
   await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
   return resetPasswordToken;
 };
