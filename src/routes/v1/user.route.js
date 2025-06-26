@@ -7,6 +7,11 @@ const userController = require('../../controllers/user.controller');
 const router = express.Router();
 
 router
+    .route('/landing')
+    .post(validate(userValidation.landingMessageValidate),userController.sendEmailAdmin)
+
+
+router
   .route('/')
   .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)
   .get(auth('manageUsers'), userController.getUsers);

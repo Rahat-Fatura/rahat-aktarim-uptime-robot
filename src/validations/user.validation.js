@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { password, validRoles } = require('./custom.validation');
 
+
 const createUser = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -47,10 +48,20 @@ const deleteUser = {
   }),
 };
 
+const landingMessageValidate = {
+  body: Joi.object()
+    .keys({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      message: Joi.string().required()
+    })
+}
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  landingMessageValidate,
 };
