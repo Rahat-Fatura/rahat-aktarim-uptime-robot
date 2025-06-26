@@ -32,10 +32,6 @@ const createMonitor = catchAsync(async (req, res) => {
 
 const getMonitor = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.user.id);
-  monitors.map(monitor =>{
-    monitor.successRate = generateReport(monitor.logs)?generateReport(monitor.logs).successRate:'0%';
-    delete monitor.logs;
-  }) 
   res.status(httpStatus.OK).send(monitors);
 });
 
