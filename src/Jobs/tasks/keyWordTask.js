@@ -93,21 +93,25 @@ function isMatchFound(jsonData, searchObj) {
   const data = typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
 
   function deepSearch(obj) {
+    console.log("response",obj)
+    console.log("search obje:",searchObj)
     if (typeof obj !== "object" || obj === null) return false;
     const isMatch = Object.keys(searchObj).every(
       (key) => obj.hasOwnProperty(key) && obj[key] === searchObj[key]
     );
+    
     if (isMatch) return true;
     for (const key in obj) {
       if (deepSearch(obj[key])) return true;
     }
+    console.log("isMatch:",isMatch)
     return false;
   }
   return deepSearch(data);
 }
 
 const controlKeyWord = async (data, contentType, keyword) => {
-  let flag = false;
+  let flag = null;
   if (contentType.includes("application/json")) {
     return isMatchFound(data, keyword);
   } else if (contentType.includes("xml")) {
