@@ -33,7 +33,7 @@ const getMonitor = async (userId) => {
   try {
     monitor = await Monitor.findMany({
       where: {
-        serverOwner: { id: Number(userId)},
+        serverOwner: { id: Number(userId) },
       },
       select: {
         id: true,
@@ -204,7 +204,7 @@ const getInstantControlMonitorById = async (id) => {
 };
 
 const getMaintenance = async (userId) => {
-  const monitor = await Monitor.findMany({
+  let monitor = await Monitor.findMany({
     where: { serverOwner: { id: Number(userId) } },
     select: {
       id: true,
@@ -217,8 +217,56 @@ const getMaintenance = async (userId) => {
           status: true,
         },
       },
+      httpMonitor: {
+        select: {
+          host: true,
+        },
+      },
+      pingMonitor: {
+        select: {
+          host: true,
+        },
+      },
+      portMonitor: {
+        select: {
+          host: true,
+        },
+      },
+      keyWordMonitor: {
+        select: {
+          host: true,
+        },
+      },
+      cronJobMonitor: {
+        select: {
+          host: true,
+        },
+      },
     },
   });
+  monitor = monitor.map((obj) => {
+        const subMonitor =
+          obj.cronJobMonitor ||
+          obj.httpMonitor ||
+          obj.pingMonitor ||
+          obj.portMonitor ||
+          obj.keyWordMonitor;
+        const host = subMonitor?.host || null;
+
+        const {
+          httpMonitor,
+          pingMonitor,
+          portMonitor,
+          keyWordMonitor,
+          cronJobMonitor,
+          ...rest
+        } = obj;
+
+        return {
+          ...rest,
+          host,
+        };
+      });
   return monitor;
 };
 
