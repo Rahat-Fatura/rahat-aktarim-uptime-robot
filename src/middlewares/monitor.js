@@ -6,7 +6,6 @@ const config = require('../config/config');
 
 
 const accessToMonitor =()=>catchAsync(async (req, res, next) => {
-  console.log(req.body)
   const monitor = await monitorService.getMonitorById(req.params.id,false);
   const user= await userService.getUserById(req.user.id);
   if (monitor.userId == user.id || user.role == 'admin') {

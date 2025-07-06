@@ -1,36 +1,6 @@
 const joi = require('joi');
 const dayjs = require('dayjs');
 
-const getMonitorById = {
-  params: joi.object().keys({
-    id: joi.string().required(),
-  }),
-};
-
-const deleteMonitor = {
-  params: joi.object().keys({
-    id: joi.string().required(),
-  }),
-};
-
-const pauseMonitor = {
-  params: joi.object().keys({
-    id: joi.string().required(),
-  }),
-};
-
-const playMonitor = {
-  params: joi.object().keys({
-    id: joi.string().required(),
-  }),
-};
-
-const reportMonitor = {
-  params: joi.object().keys({
-    id: joi.string().required(),
-  }),
-};
-
 const monitorMaintenance = {
   params: joi.object().keys({
     id: joi.string().required(),
@@ -64,11 +34,6 @@ const stopMaintananceJob = {
 };
 
 module.exports = {
-  deleteMonitor,
-  pauseMonitor,
-  playMonitor,
-  reportMonitor,
   monitorMaintenance,
   stopMaintananceJob,
-  getMonitorById,
 };

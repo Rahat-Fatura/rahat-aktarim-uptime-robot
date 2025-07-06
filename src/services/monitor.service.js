@@ -167,6 +167,23 @@ const getMonitorById = async (id, flag) => {
   return monitor;
 };
 
+const getMonitorByIdWithLogs = async (monitorId) => {
+  const monitor = await Monitor.findUnique({
+    where: { id: Number(monitorId) },
+    include: {
+      httpMonitor: true,
+      pingMonitor: true,
+      portMonitor: true,
+      keyWordMonitor: true,
+      cronJobMonitor: true,
+      serverOwner: true,
+      maintanance: true,
+      logs: true,
+    }
+  });
+  return monitor;
+};
+
 const updateMonitorById = async (monitorId, updateBody) => {
   const monitor = await getMonitorById(monitorId, false);
   if (!monitor) {
@@ -245,28 +262,28 @@ const getMaintenance = async (userId) => {
     },
   });
   monitor = monitor.map((obj) => {
-        const subMonitor =
-          obj.cronJobMonitor ||
-          obj.httpMonitor ||
-          obj.pingMonitor ||
-          obj.portMonitor ||
-          obj.keyWordMonitor;
-        const host = subMonitor?.host || null;
+    const subMonitor =
+      obj.cronJobMonitor ||
+      obj.httpMonitor ||
+      obj.pingMonitor ||
+      obj.portMonitor ||
+      obj.keyWordMonitor;
+    const host = subMonitor?.host || null;
 
-        const {
-          httpMonitor,
-          pingMonitor,
-          portMonitor,
-          keyWordMonitor,
-          cronJobMonitor,
-          ...rest
-        } = obj;
+    const {
+      httpMonitor,
+      pingMonitor,
+      portMonitor,
+      keyWordMonitor,
+      cronJobMonitor,
+      ...rest
+    } = obj;
 
-        return {
-          ...rest,
-          host,
-        };
-      });
+    return {
+      ...rest,
+      host,
+    };
+  });
   return monitor;
 };
 
@@ -500,6 +517,7 @@ module.exports = {
   getInstantMonitors,
   getInstantControlMonitorById,
   getMonitorById,
+  getMonitorByIdWithLogs,
   updateMonitorById,
   deleteMonitorById,
   reportRender,
