@@ -8,7 +8,7 @@ const createMonitor = {
       .string()
       .uri({
         scheme: ['http', 'https'],
-        allowRelative: false,
+        allowRelative: true,
         allowQuerySquareBrackets: true,
       })
       .required(),
@@ -54,7 +54,7 @@ const updateMonitor = {
       .string()
       .uri({
         scheme: ['http', 'https'],
-        allowRelative: false,
+        allowRelative: true,
         allowQuerySquareBrackets: true,
       })
       .required(),

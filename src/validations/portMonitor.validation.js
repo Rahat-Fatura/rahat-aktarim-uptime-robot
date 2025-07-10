@@ -10,11 +10,18 @@ const createMonitor = {
           .custom((value, helpers) => {
             const ipSchema = joi.string().ip({ version: ["ipv4", "ipv6"] });
             const hostSchema = joi.string().hostname();
-
+            const urlSchema = joi
+                  .string()
+                  .uri({
+                    scheme: ['http', 'https'],
+                    allowRelative: true,
+                    allowQuerySquareBrackets: true,
+                  });
+            const isUrl =  !urlSchema.validate(value).error;
             const isIp = !ipSchema.validate(value).error;
             const isHost = !hostSchema.validate(value).error;
-
-            if (isIp || isHost) {
+            
+            if (isIp || isHost || isUrl) {
               return value;
             }
 
@@ -58,11 +65,18 @@ const updateMonitor = {
           .custom((value, helpers) => {
             const ipSchema = joi.string().ip({ version: ["ipv4", "ipv6"] });
             const hostSchema = joi.string().hostname();
-
+            const urlSchema = joi
+                  .string()
+                  .uri({
+                    scheme: ['http', 'https'],
+                    allowRelative: true,
+                    allowQuerySquareBrackets: true,
+                  });
+            const isUrl =  !urlSchema.validate(value).error;
             const isIp = !ipSchema.validate(value).error;
             const isHost = !hostSchema.validate(value).error;
 
-            if (isIp || isHost) {
+            if (isIp || isHost || isUrl) {
               return value;
             }
 
