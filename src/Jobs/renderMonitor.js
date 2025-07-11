@@ -9,8 +9,9 @@ const renderMonitor = async()=>{
     channel = await connection.createChannel();
     //await channel.deleteQueue("monitor_parser_queue")
     await channel.assertQueue("monitor_parser_queue");
-    return cron.schedule('*/5 * * * * *', async () => {
+    return cron.schedule('*/3 * * * * *', async () => {
       const monitors = await monitorService.runJob();
+      console.log("Menin Monitors: ",monitors)
       if(monitors){
         channel.sendToQueue("monitor_parser_queue", Buffer.from(JSON.stringify(monitors)));
       }

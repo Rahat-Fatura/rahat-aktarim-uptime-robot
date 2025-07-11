@@ -175,7 +175,9 @@ async function sendRequestAndControlKey(monitor) {
     if (["POST", "PUT", "PATCH"].includes(monitor.method)) {
       config.data = monitor.body || {};
     }
+    console.log(config)
     const response = await axios(config);
+    console.log(response)
     responseTime = Date.now() - startTime;
     isError = !(await controlKeyWord(
       response.data,

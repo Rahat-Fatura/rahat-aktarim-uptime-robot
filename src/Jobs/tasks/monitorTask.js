@@ -107,6 +107,7 @@ async function sendRequest(monitor) {
       config.data = monitor.body || {};
     }
     const response = await axios(config);
+    console.log(response.status);
     responseTime = Date.now() - startTime;
     if (monitor.allowedStatusCodes.length > 0) {
       isError = !monitor.allowedStatusCodes.includes(

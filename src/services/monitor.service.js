@@ -467,7 +467,6 @@ const runJob = async () => {
       select: {
         id: true,
         monitorType: true,
-        isProcess: true,
       },
     });
     const ids = toProcesses.map((m) => m.id);
@@ -480,25 +479,9 @@ const runJob = async () => {
         isProcess: true,
       },
     });
-
-    const monitors2 = await tx.monitor.findMany({
-      where: {
-        controlTime: {
-          lte: new Date(),
-        },
-        isProcess: true,
-        isActiveByOwner: true,
-      },
-      select: {
-        id: true,
-        monitorType: true,
-        isProcess: true,
-      },
-    });
-    console.log("Monitors:", monitors2);
+    
     return toProcesses;
   });
-  //console.log(monitors)
 
   return monitors;
 };

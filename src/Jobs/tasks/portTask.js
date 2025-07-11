@@ -105,16 +105,19 @@ function checkTcpPort(host, port, timeout) {
     socket.setTimeout(timeout);
 
     socket.on("connect", () => {
+      console.log("connect Çalıltı")
       isOpen = true;
       socket.destroy();
     });
 
     socket.on("timeout", () => {
+      console.log("timeOut Çalıltı")
       isOpen = false;
       socket.destroy();
     });
 
-    socket.on("error", () => {
+    socket.on("error", (error) => {
+      console.log("onError Çalıltı: ", error)
       isOpen = false;
     });
 
