@@ -14,6 +14,8 @@ const getMe = catchAsync(async (req, res) => {
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
+  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+  await emailService.sendVerificationEmail(user.email, verifyEmailToken);
   res.status(httpStatus.CREATED).send({ ...tokens });
 });
 

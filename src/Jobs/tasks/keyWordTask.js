@@ -8,6 +8,7 @@ const axios = require("axios");
 const { cronExprension } = require("../utils/taskUtils");
 const xml2js = require("xml2js");
 const cheerio = require("cheerio");
+const he = require("he");
 
 async function keyWordTask(monitor) {
   try {
@@ -120,8 +121,7 @@ const controlKeyWord = async (data, contentType, keyword) => {
     const xmlStr = JSON.stringify(xmlObj).toLowerCase();
     return xmlStr.includes(keyword.toLowerCase());
   } else if (
-    contentType.includes("text/html") ||
-    contentType.includes("text/plain")
+    contentType.includes("text/html") 
   ) {
     const artirbuts = keyword.split("<")[1].split(">")[0];
     const key = artirbuts.split(" ")[0];
@@ -154,6 +154,11 @@ const controlKeyWord = async (data, contentType, keyword) => {
       }
     }
     return flag;
+  }
+  else if(contentType.includes("text/plain")){
+     const dataLowwer = data.toLowerCase();
+     const keyWordLower = keyword.toLowerCase();
+     return dataLowwer.includes(keyWordLower);
   } else {
     console.warn(`[!] Desteklenmeyen Content-Type: ${contentType}`);
     return flag;
@@ -177,7 +182,7 @@ async function sendRequestAndControlKey(monitor) {
     }
     console.log(config)
     const response = await axios(config);
-    console.log(response)
+   // console.log(response)
     responseTime = Date.now() - startTime;
     isError = !(await controlKeyWord(
       response.data,

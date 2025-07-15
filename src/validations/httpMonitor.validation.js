@@ -12,7 +12,7 @@ const createMonitor = {
         allowQuerySquareBrackets: true,
       })
       .required(),
-      method: joi.string().required(),
+      method: joi.string().valid("GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS").required(),
       body: joi.object(),
       headers: joi.object(),
       allowedStatusCodes: joi.array().items(joi.string().custom((value,helpers)=>{
@@ -58,7 +58,7 @@ const updateMonitor = {
         allowQuerySquareBrackets: true,
       })
       .required(),
-      method: joi.string().required(),
+      method: joi.string().valid("GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS").required(),
       body: joi.object(),
       headers: joi.object(),
       allowedStatusCodes: joi.array().items(joi.string().custom((value,helpers)=>{

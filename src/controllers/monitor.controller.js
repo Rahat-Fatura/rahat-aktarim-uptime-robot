@@ -19,8 +19,6 @@ reportTaskWorker();
 renderMonitor();
 monitorParser();
 
-
-
 const createMonitor = catchAsync(async (req, res) => {
   let now = new Date();
   let monitor = await monitorService.createMonitor(req.body, req.user);

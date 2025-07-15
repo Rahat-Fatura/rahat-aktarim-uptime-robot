@@ -94,6 +94,7 @@ model KeyWordMonitor {
   headers            Json?
   allowedStatusCodes String[]    @default([])
   keyWord            String
+  keyWordType        KeyWordType?
   timeOut            Int        @default(30)
   userId             Int
   monitor            Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
@@ -190,4 +191,10 @@ enum MonitorType {
   PortMonitor
   KeywordMonitor
   CronJobMonitor
+}
+
+enum KeyWordType {
+  txt
+  html
+  json
 }

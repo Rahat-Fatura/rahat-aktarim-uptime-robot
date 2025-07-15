@@ -74,10 +74,9 @@ async function reportTask(monitor) {
     catch(error){
       console.log(error)
     }
-    
-    console.log("Helo")
+  
   let now = new Date();
-  now.setMonth(now.getUTCMonth());
+  now.setMonth(now.getMonth()+1);
   await monitorService.updateMonitorById(monitor.id,{
     reportTime: now
   });

@@ -12,7 +12,7 @@ const Monitor = require("../utils/database").monitor;
  */
 const createMonitor = async (monitorBody, userId) => {
   const now = new Date();
-  now.setMonth(now.getUTCMonth() + 1);
+  now.setMonth(now.getMonth() + 1);
   const controlTime = new Date(
     new Date().getTime() +
       cronExprension(monitorBody.interval, monitorBody.intervalUnit)
@@ -443,13 +443,15 @@ const getKeyWordMonitorWithBody = async (id) => {
 };
 
 const reportRender = async () => {
-  const monitors = await Monitor.findMany({
-    where: {
-      reportTime: {
-        lte: new Date(),
+ 
+    const monitors = await Monitor.findMany({
+      where: {
+        reportTime: {
+          lte: new Date(),
+        }
       },
-    },
-  });
+    });
+
 
   return monitors;
 };

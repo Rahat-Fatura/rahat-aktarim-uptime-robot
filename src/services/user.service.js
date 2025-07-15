@@ -2,7 +2,6 @@ const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const User = require('../utils/database').user;
-
 /**
  * Create a user
  * @param {Object} userBody

@@ -41,7 +41,8 @@ const createKeyWordMonitor = async(monitorBody,userId) =>{
         body: monitorBody.keyWordMonitor.body,
         headers: monitorBody.keyWordMonitor.headers,
         allowedStatusCodes: monitorBody.keyWordMonitor.allowedStatusCodes,
-        keyWord: he.decode(monitorBody.keyWordMonitor.keyWord),
+        keyWordType: monitorBody.keyWordMonitor.keyWordType,
+        keyWord: monitorBody.keyWordMonitor.keyWord,
         userId: Number(userId),
       }
     })
@@ -81,6 +82,7 @@ const getKeyWordMonitorFullDataById = async(id) =>{
         headers: true,
         timeOut: true,
         allowedStatusCodes: true,
+        keyWordType: true,
         keyWord: true,
         monitor: {
           select: {
@@ -105,7 +107,7 @@ const getKeyWordMonitorFullDataById = async(id) =>{
 }
 
 const updateKeyWordMonitorById = async(id, updateData) => {
-   const keyWordBody = updateData.keyWordMonitor;
+   let keyWordBody = updateData.keyWordMonitor;
    delete updateData.keyWordMonitor;
    const monitorBody = updateData;
    let keyWordMonitor = await getKeyWordMonitorById(id);
@@ -116,7 +118,7 @@ const updateKeyWordMonitorById = async(id, updateData) => {
     keyWordMonitor = await KeyWordMonitor.update({ where: { id: Number(id) }, data: keyWordBody })
     await monitorService.updateMonitorById(id,monitorBody);
   }
-  catch(error){
+  catch(error){  
     console.log(error)
    throw new ApiError(httpStatus.BAD_REQUEST, 'Unsuccess update Monitor !');
   }
