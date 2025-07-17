@@ -11,7 +11,6 @@ const renderMonitor = async()=>{
     await channel.assertQueue("monitor_parser_queue");
     return cron.schedule('*/3 * * * * *', async () => {
       const monitors = await monitorService.runJob();
-      console.log("Menin Monitors: ",monitors)
       if(monitors){
         channel.sendToQueue("monitor_parser_queue", Buffer.from(JSON.stringify(monitors)));
       }

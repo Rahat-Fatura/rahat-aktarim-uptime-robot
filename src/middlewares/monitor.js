@@ -14,6 +14,31 @@ const accessToMonitor =()=>catchAsync(async (req, res, next) => {
   else{
     return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
   }
+});
+
+const accessToMonitors =()=>catchAsync(async (req, res, next) => {
+  let flag = false;
+  const monitorsId = await monitorService.getMonitorsOnlyId(req.user.id);
+  console.log(req.body)
+  const reqMonitorsId = req.body.ids;
+  console.log("Kullanıcı Server ids: ",monitorsId);
+  console.log("Kullanıcı send Ids :", reqMonitorsId)
+  for (let index = 0; index < reqMonitorsId.length; index++) {
+    flag = monitorsId.includes(reqMonitorsId[index]);
+    if(flag){
+      flag=true
+    }
+    else{
+      flag=false;
+      break;
+    }
+  }
+  if(flag){
+    next();
+  }
+  else{
+    return next(new ApiError(httpStatus.FORBIDDEN, 'Forbidden'));
+  }
   
 });
 
@@ -33,4 +58,5 @@ const accessToCronJob =()=>catchAsync(async (req, res, next) => {
 module.exports = {
   accessToMonitor,
   accessToCronJob,
+  accessToMonitors
 };

@@ -25,6 +25,24 @@ const playMonitor = {
   }),
 };
 
+const deleteMonitors = {
+  body: joi.object().keys({
+    ids:joi.array().items(joi.number().required()).unique().required()
+  })
+};
+
+const pauseMonitors = {
+  body: joi.object().keys({
+    ids:joi.array().items(joi.number().required()).unique().required()
+  })
+};
+
+const playMonitors = {
+  body: joi.object().keys({
+    ids:joi.array().items(joi.number().required()).unique().required()
+  })
+};
+
 const reportMonitor = {
   params: joi.object().keys({
     id: joi.string().required(),
@@ -71,4 +89,7 @@ module.exports = {
   monitorMaintenance,
   stopMaintananceJob,
   getMonitorById,
+  deleteMonitors,
+  pauseMonitors,
+  playMonitors,
 };

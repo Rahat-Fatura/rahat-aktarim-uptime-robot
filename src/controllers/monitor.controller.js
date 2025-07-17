@@ -68,6 +68,21 @@ const playMonitor = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(monitor);
 });
 
+const deleteMonitors = catchAsync(async (req, res) => {
+  const monitor = await monitorService.deleteMonitorsByIds(req.body.ids);
+  res.status(httpStatus.OK).send();
+});
+
+const pauseMonitors = catchAsync(async (req, res) => {
+  const monitors = await monitorService.updateMonitorsByIds(req.body.ids,{ isActiveByOwner: false, status: 'uncertain'});
+  res.status(httpStatus.OK).send();
+});
+
+const playMonitors = catchAsync(async (req, res) => {
+  const monitors = await monitorService.updateMonitorsByIds(req.body.ids,{ isActiveByOwner: true});
+  res.status(httpStatus.OK).send();
+});
+
 const getMonitorWithLogs = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.user.id);
   if (!monitors) {
@@ -145,4 +160,7 @@ module.exports = {
   sentRequestInstantControlMonitor,
   getUserMonitors,
   getMonitorWithLogsForAdmin,
+  deleteMonitors,
+  pauseMonitors,
+  playMonitors,
 };

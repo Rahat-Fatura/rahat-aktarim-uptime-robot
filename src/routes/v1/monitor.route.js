@@ -4,7 +4,7 @@ const router = express.Router();
 const monitorController = require('../../controllers/monitor.controller');
 const cronJobController = require('../../controllers/cronJobMonitor.controller');
 const validate = require('../../middlewares/validate');
-const { accessToMonitor, accessToCronJob } = require('../../middlewares/monitor');
+const { accessToMonitor, accessToCronJob, accessToMonitors } = require('../../middlewares/monitor');
 const monitorValidate = require('../../validations/monitor.validation');
 
 const httpMonitor = require("./monitorRoutes/httpMonitor.route");
@@ -54,6 +54,29 @@ router.get(
 router.get('/:userId', auth('manageUsers'), monitorController.getUserMonitors);
 
 router.put(
+  '/multi-pause',
+  validate(monitorValidate.pauseMonitors),
+  auth('getUsers'),
+  accessToMonitors(),
+  monitorController.pauseMonitors,
+);
+
+router.put(
+  '/multi-play',
+  validate(monitorValidate.playMonitors),
+  auth('getUsers'),
+  accessToMonitors(),
+  monitorController.playMonitors,
+);
+router.delete(
+  '/multiple-delete',
+  validate(monitorValidate.deleteMonitors),
+  auth('getUsers'),
+  accessToMonitors(),
+  monitorController.deleteMonitors,
+);
+
+router.put(  
   '/:id/pause',
   auth('getUsers'),
   accessToMonitor(),
