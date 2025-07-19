@@ -13,6 +13,7 @@ const maintananceJob = async () => {
     return cron.schedule("0 */1 * * * *", async () => {
       console.log("Maintanance Task job started");
       const maintanances = await maintananceService.runMaintananceTask();
+      console.log("MAintnanannance :", maintanances)
       if(maintanances){
        // console.log(maintanances)
         maintanances.map(maintanance =>{

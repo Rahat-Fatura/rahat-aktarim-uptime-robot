@@ -70,6 +70,7 @@ const getMonitor = async (userId) => {
           },
         },
         logs: true,
+        maintanance: true,
       },
     });
     monitor = monitor.map((obj) => {
