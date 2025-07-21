@@ -1,4 +1,4 @@
-
+const moment = require('moment');
 const { monitorService, monitorLogService, emailService } = require('../../services');
 
 function generateReport(logs) {
@@ -44,16 +44,16 @@ function generateReportCollective(monitors){
 async function reportTask(monitor) {
   const controlMonitor = await monitorService.getMonitorById(monitor.id, true);
   let beforeMonth = new Date(monitor.reportTime);
-  beforeMonth.setMonth(beforeMonth.getUTCMonth-1);
+  let cuurrentDate = new Date(monitor.reportTime);
+  beforeMonth.setMonth(beforeMonth.getMonth()-1);
   const user = controlMonitor.serverOwner;
   const logs = await monitorLogService.getLogsByTime(monitor.id);
   const report = generateReport(logs);
-  console.log(report) 
-  const subject = `${monitor.name} için ${beforeMonth.toDateString()} ${monitor.reportTime} Raporunuz`;
+  const subject = `${monitor.name} için ${moment(beforeMonth).format('DD-MM-YYYY')}  ${moment(cuurrentDate).format('DD-MM-YYYY')} aralığında sistem raporunuz`;
   const text = `
       Merhaba,
   
-      İşte ${monitor.name} için son ${monitor.reportTime} ${monitor.reportTimeUnit} içindeki sunucu istek raporunuz:
+      İşte ${monitor.name} için son 1 ay içindeki sistem raporunuz:
   
       - Toplam istek sayısı: ${report ? report.totalRequests : 0}
       - Başarılı istek sayısı: ${report ? report.successRate : 0}
@@ -63,7 +63,7 @@ async function reportTask(monitor) {
   
       İyi günler dileriz! 
     `;
-    console.log("Mail gönderildi ",text);
+    
     try{
       await emailService.sendEmail(
       `<${user.email}>`,

@@ -39,15 +39,11 @@ async function monitorTask(monitor) {
       monitor.status = "up";
       monitor.isProcess = false;
       const now = new Date();
-      monitor.controlTime = new Date(
+      monitor.controlTime = new Date( 
         now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
       );
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, {
-        status: monitor.status,
-        isProcess: monitor.isProcess,
-        controlTime: monitor.controlTime,
-      });
+      await monitorService.monitorUpdateAfterTask(monitor);
     } else {
       if (monitor.status === "up" || monitor.status === "uncertain") {
         try {
@@ -80,11 +76,7 @@ async function monitorTask(monitor) {
         now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
       );
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, {
-        status: monitor.status,
-        isProcess: monitor.isProcess,
-        controlTime: monitor.controlTime,
-      });
+      await monitorService.monitorUpdateAfterTask(monitor);
     }
   } catch (error) {
     console.log(error);

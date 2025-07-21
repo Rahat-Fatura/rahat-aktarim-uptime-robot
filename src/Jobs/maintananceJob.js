@@ -10,7 +10,7 @@ const maintananceJob = async () => {
     channel = await connection.createChannel();
     //await channel.deleteQueue("monitor_parser_queue")
     await channel.assertQueue("monitor_maintanance_queue");
-    return cron.schedule("0 */1 * * * *", async () => {
+    return cron.schedule("*/10 * * * * *", async () => {
       console.log("Maintanance Task job started");
       const maintanances = await maintananceService.runMaintananceTask();
       console.log("MAintnanannance :", maintanances)

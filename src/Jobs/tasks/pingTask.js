@@ -40,11 +40,7 @@ const pingTask = async (monitor) => {
       );
       //console.log(monitor)
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, {
-        status: monitor.status,
-        isProcess: monitor.isProcess,
-        controlTime: monitor.controlTime,
-      });
+      await monitorService.monitorUpdateAfterTask(monitor);
     } else {
       if (monitor.status === "up" || monitor.status === "uncertain") {
         try {
@@ -64,6 +60,7 @@ const pingTask = async (monitor) => {
                 Saygılarımızla,
                 Rahat Up Ekibi`
           );
+          
         } catch (error) {}
       }
 
@@ -74,11 +71,7 @@ const pingTask = async (monitor) => {
         now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
       );
       await monitorLogService.createLog(monitor, result);
-      await monitorService.updateMonitorById(monitor.id, {
-        status: monitor.status,
-        isProcess: monitor.isProcess,
-        controlTime: monitor.controlTime,
-      });
+      await monitorService.monitorUpdateAfterTask(monitor);
     }
   } catch (error) {
     console.log(error);

@@ -556,6 +556,19 @@ const deleteMonitorsByIds = async(ids) =>{
   
 }
 
+const monitorUpdateAfterTask = async(monitor)=>{
+  try {
+    await updateMonitorById(monitor.id, {
+        status: monitor.status,
+        isProcess: monitor.isProcess,
+        controlTime: monitor.controlTime,
+    });
+  } catch (error) {
+    console.log("Error updating monitor after task:", error);
+  }
+  
+}
+
 module.exports = {
   createMonitor,
   getMonitor,
@@ -576,5 +589,6 @@ module.exports = {
   staytedsInQueue,
   getMonitorsOnlyId,
   updateMonitorsByIds,
-  deleteMonitorsByIds
+  deleteMonitorsByIds,
+  monitorUpdateAfterTask,
 };

@@ -5,8 +5,9 @@ const maintananceTask = async(maintanance) => {
   console.log( new Date(maintanance.controlTime).getTime())
   console.log(new Date(maintanance.startTime).getTime() === new Date(maintanance.controlTime).getTime())
   console.log(new Date(maintanance.startTime) === new Date(maintanance.controlTime))
+  
   if (new Date(maintanance.endTime).getTime() <= new Date().getTime()) {
-    console.log("eNSON GELALİ YERİ")
+    console.log("ENSON GELİP BİTEN YERİ")
     await maintananceService.updateMaintananceById(maintanance.id, {
       controlTime: maintanance.startTime,
       status: false,
