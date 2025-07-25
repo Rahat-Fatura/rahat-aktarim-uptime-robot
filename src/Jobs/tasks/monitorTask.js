@@ -36,6 +36,7 @@ async function monitorTask(monitor) {
           console.log(error);
         }
       }
+      monitor.failCount = monitor.failCountRef;
       monitor.status = "up";
       monitor.isProcess = false;
       const now = new Date();
@@ -45,7 +46,8 @@ async function monitorTask(monitor) {
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     } else {
-      if (monitor.status === "up" || monitor.status === "uncertain") {
+      monitor.failCount--;
+      if (monitor.failCount === 0) {
         try {
           await emailService.sendEmail(
             `<${monitor.serverOwner.email}>`,
@@ -68,13 +70,13 @@ async function monitorTask(monitor) {
           console.log(error);
         }
       }
-
       monitor.isProcess = false;
       monitor.status = "down";
       const now = new Date();
-      monitor.controlTime = new Date(
+      monitor.controlTime = new Date( 
         now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
       );
+      
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     }

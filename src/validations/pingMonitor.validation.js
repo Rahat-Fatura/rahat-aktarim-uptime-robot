@@ -22,7 +22,7 @@ const createMonitor = {
           }, "IP or Hostname validation")
           .required(),
       })
-      .required(),
+    .required(),
     interval: joi
       .number()
       .required()

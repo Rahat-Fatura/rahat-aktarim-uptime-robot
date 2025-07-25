@@ -32,17 +32,18 @@ const pingTask = async (monitor) => {
           );
         } catch (error) {}
       }
+      monitor.failCount = monitor.failCountRef;
       monitor.status = "up";
       monitor.isProcess = false;
       const now = new Date();
       monitor.controlTime = new Date(
         now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
       );
-      //console.log(monitor)
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     } else {
-      if (monitor.status === "up" || monitor.status === "uncertain") {
+      monitor.failCount--;
+      if (monitor.failCount === 0) {
         try {
           await emailService.sendEmail(
             `<${monitor.serverOwner.email}>`,

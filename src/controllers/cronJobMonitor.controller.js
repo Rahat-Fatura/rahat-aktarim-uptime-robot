@@ -58,17 +58,24 @@ const updateMonitor = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(monitor);
 });
 
-
 const cronJobMonitor = catchAsync(async (req, res) => {
-    const date = new Date();
+    let now = new Date();
     let data;
     console.log("cronJobMonitor",req.params.id);
-    let monitor = await cronJobMonitorService.getCronJobMonitorById(req.params.id,false);
+    let monitor = await cronJobMonitorService.getCronJobMonitorById(req.params.id);
     const monitorBody = await monitorService.getMonitorById(req.params.id);
     if (!monitor || !monitorBody) {
         return res.status(httpStatus.NOT_FOUND).send({ message: 'Monitor not found' });
     }
-    monitor = await cronJobMonitorService.cronJobMonitorHeartBeat(monitor.id,date);
+    if( monitor.lastRequestTime === null || monitor.lastRequestTime === undefined){
+        monitor.lastRequestTime = now;
+        let controlTime = new Date(now.getTime() + cronExprension(monitorBody.interval, monitorBody.intervalUnit) + cronExprension(monitor.devitionTime, "minutes"));
+        await monitorService.updateMonitorById(monitor.id, {
+            controlTime: controlTime,
+            isProcess: false
+        });
+    }
+    monitor = await cronJobMonitorService.cronJobMonitorHeartBeat(monitor.id, now);
     data = controlRequestTime(monitor, monitorBody.controlTime);
     
    res.status(httpStatus.OK).send(data); 

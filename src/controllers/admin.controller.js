@@ -1,6 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
-const { monitorService } = require('../services');
+const { monitorService, userService } = require('../services');
 const { generateReportCollective, generateReport } = require('../Jobs/tasks/reportTask');
 const {
         monitorTask,
@@ -8,26 +8,12 @@ const {
         portTask,
         keyWordTask,
      } = require('../Jobs/tasks/index');
-const { renderMonitor } = require('../Jobs/renderMonitor');
-const { monitorParser } = require('../Jobs/monitorParser');
-const { reportTaskWorker } = require('../Jobs/reportTaskWorker');
-const { reportJobRender } = require('../Jobs/reportJobRender');
 
-monitorService.staytedsInQueue();
-reportJobRender();
-reportTaskWorker();
-renderMonitor();
-monitorParser();
 
 const createMonitor = catchAsync(async (req, res) => {
   let now = new Date();
   let monitor = await monitorService.createMonitor(req.body, req.user);
   res.status(httpStatus.CREATED).send(monitor);
-});
-
-const getMonitor = catchAsync(async (req, res) => {
-  const monitors = await monitorService.getMonitor(req.user.id);
-  res.status(httpStatus.OK).send(monitors);
 });
 
 const getMonitorById = catchAsync(async (req, res) => {
@@ -37,10 +23,8 @@ const getMonitorById = catchAsync(async (req, res) => {
 
 const getUserMonitors = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.params.userId);
-  monitors.map(monitor =>{
-    monitor.successRate = generateReport(monitor.logs)?generateReport(monitor.logs).successRate:'0%';
-    delete monitor.logs;
-  }) 
+  const user = await userService.getUserById(req.params.userId);
+  monitors.push(user);
   res.status(httpStatus.OK).send(monitors);
 });
 
@@ -60,7 +44,6 @@ const pauseMonitor = catchAsync(async (req, res) => {
     isActiveByOwner: false,
     status: "uncertain",
   });
-  
   res.status(httpStatus.OK).send(monitor);
 });
 
@@ -147,18 +130,9 @@ const sentRequestInstantControlMonitor = catchAsync(async (req, res) =>  {
   res.status(httpStatus.OK).send(response);
 });
 
-const getMonitorsNamesAndIDs = catchAsync(async (req, res) => {
-  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-  const monitors = await monitorService.getMonitorsNamesAndIDs(req.user.id);
-  if (!monitors) {
-    throw new Error('Monitors not found');
-  }
-  res.status(httpStatus.OK).send(monitors);
-});
 
 module.exports = {
   createMonitor,
-  getMonitor,
   getMonitorById,
   updateMonitor,
   deleteMonitor,
@@ -172,5 +146,4 @@ module.exports = {
   deleteMonitors,
   pauseMonitors,
   playMonitors,
-  getMonitorsNamesAndIDs
 };

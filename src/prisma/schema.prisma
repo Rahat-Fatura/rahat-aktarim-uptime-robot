@@ -52,7 +52,9 @@ model Monitor {
   isActiveByOwner    Boolean    @default(true)
   isProcess          Boolean    @default(false)
   controlTime        DateTime   
-  notifications      Notification?     
+  notifications      Notification?
+  failCount          Int?        @default(3)
+  failCountRef       Int?        @default(3)  
 }
 
 model HttpMonitor {

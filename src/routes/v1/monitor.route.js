@@ -13,6 +13,9 @@ const keyWordMonitor = require("./monitorRoutes/keyWordMonitor.route");
 const portMonitor = require("./monitorRoutes/portMonitor.route");
 const cronJobMonitor = require("./monitorRoutes/cronJobMonitor.route");
 const maintanance = require("./monitorRoutes/maintanance.route");
+const admin = require("./monitorRoutes/admin.route");
+
+
 
 router.use('/http', auth('getUsers'), httpMonitor);
 router.use('/ping', auth('getUsers'), pingMonitor);
@@ -20,9 +23,11 @@ router.use('/keyword', auth('getUsers'), keyWordMonitor);
 router.use('/port', auth('getUsers'), portMonitor);
 router.use('/cronjob', auth('getUsers'), cronJobMonitor);
 router.use('/maintanance',auth('getUsers'), maintanance);
-
+router.use('/admin',auth('manageUsers'), admin);
 router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
 router.get('/', auth('getUsers'), monitorController.getMonitor);
+
+router.get('/namesAndIDs',auth('getUsers'), monitorController.getMonitorsNamesAndIDs);
 
 router.get(
   '/:id',
@@ -31,6 +36,9 @@ router.get(
   validate(monitorValidate.getMonitorById),
   monitorController.getMonitorById,
 );
+
+
+
 router.get(
   '/logs',
   auth('getUsers'),
@@ -49,9 +57,6 @@ router.get(
   accessToMonitor(),
   monitorController.sentRequestInstantControlMonitor,
 );
-
-
-router.get('/:userId', auth('manageUsers'), monitorController.getUserMonitors);
 
 router.put(
   '/multi-pause',
@@ -98,17 +103,7 @@ router.delete(
   validate(monitorValidate.deleteMonitor),
   monitorController.deleteMonitor,
 );
-/*
-router.get(
-  '/logs/:userId',
-  auth('manageUsers'),
-  monitorController.getMonitorWithLogsForAdmin,
-);*/
-/*
-router.get(
-  '/maintanance/:userId',
-  auth('manageUsers'),
-  monitorController.getAdminMaintananceMonitor,
-);
-*/
+
+
+
 module.exports = router; 

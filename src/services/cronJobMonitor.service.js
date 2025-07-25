@@ -21,12 +21,12 @@ const createCronJobMonitor = async (monitorBody, userId) => {
   };
   try {
     monitor = await monitorService.createMonitor(body, userId);
-    controlTime = new Date(
-      monitor.controlTime.getTime() +
-        cronExprension(monitorBody.cronJobMonitor.devitionTime, "minutes")
-    );
+    // controlTime = new Date(
+    //   monitor.controlTime.getTime() +
+    //     cronExprension(monitorBody.cronJobMonitor.devitionTime, "minutes"),
+    // );
     await monitorService.updateMonitorById(monitor.id, {
-      controlTime: controlTime,
+      isProcess: true
     });
     const token = generateTokenForHeartBeat(monitor.id);
     const devToken = token.split(".")[1] + "." + token.split(".")[2];
@@ -41,6 +41,7 @@ const createCronJobMonitor = async (monitorBody, userId) => {
       },
     });
   } catch (error) {
+    console.log(error);
     throw new ApiError(httpStatus.BAD_REQUEST, "host adres daha önce alınmış");
     console.log(error);
   }

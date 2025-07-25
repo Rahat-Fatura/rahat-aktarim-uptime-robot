@@ -311,6 +311,8 @@ const getCronJobMonitorWithBody = async (id) => {
         isProcess: true,
         interval: true,
         intervalUnit: true,
+        failCount: true,
+        failCountRef: true,
       },
     });
   } catch (error) {
@@ -342,6 +344,8 @@ const getHttpMonitorWithBody = async (id) => {
         isProcess: true,
         interval: true,
         intervalUnit: true,
+        failCount: true,
+        failCountRef: true,
       },
     });
   } catch (error) {
@@ -373,6 +377,8 @@ const getPingMonitorWithBody = async (id) => {
         isProcess: true,
         interval: true,
         intervalUnit: true,
+        failCount: true,
+        failCountRef: true,
       },
     });
   } catch (error) {
@@ -404,6 +410,8 @@ const getPortMonitorWithBody = async (id) => {
         isProcess: true,
         interval: true,
         intervalUnit: true,
+        failCount: true,
+        failCountRef: true,
       },
     });
   } catch (error) {
@@ -435,6 +443,8 @@ const getKeyWordMonitorWithBody = async (id) => {
         isProcess: true,
         interval: true,
         intervalUnit: true,
+        failCount: true,
+        failCountRef: true,
       },
     });
   } catch (error) {
@@ -562,6 +572,7 @@ const monitorUpdateAfterTask = async(monitor)=>{
         status: monitor.status,
         isProcess: monitor.isProcess,
         controlTime: monitor.controlTime,
+        failCount: monitor.failCount,
     });
   } catch (error) {
     console.log("Error updating monitor after task:", error);
@@ -569,6 +580,25 @@ const monitorUpdateAfterTask = async(monitor)=>{
   
 }
 
+const getMonitorsNamesAndIDs = async (userId) => {
+  try {
+    const monitors = await Monitor.findMany({
+      where: {
+        serverOwner: { id: Number(userId) },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    return monitors;
+  } catch (error) {
+    console.log("Error fetching monitors names and IDs:", error);
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Error fetching monitors names and IDs"
+    );}
+}
 module.exports = {
   createMonitor,
   getMonitor,
@@ -591,4 +621,5 @@ module.exports = {
   updateMonitorsByIds,
   deleteMonitorsByIds,
   monitorUpdateAfterTask,
+  getMonitorsNamesAndIDs,
 };
