@@ -180,7 +180,7 @@ const getMonitorByIdWithLogs = async (monitorId) => {
       serverOwner: true,
       maintanance: true,
       logs: true,
-    }
+    },
   });
   return monitor;
 };
@@ -454,15 +454,13 @@ const getKeyWordMonitorWithBody = async (id) => {
 };
 
 const reportRender = async () => {
- 
-    const monitors = await Monitor.findMany({
-      where: {
-        reportTime: {
-          lte: new Date(),
-        }
+  const monitors = await Monitor.findMany({
+    where: {
+      reportTime: {
+        lte: new Date(),
       },
-    });
-
+    },
+  });
 
   return monitors;
 };
@@ -492,7 +490,7 @@ const runJob = async () => {
         isProcess: true,
       },
     });
-    
+
     return toProcesses;
   });
 
@@ -507,78 +505,75 @@ const staytedsInQueue = async () => {
   });
 };
 
-const getMonitorsOnlyId = async(userId) => {
- let monitors;
- try{
+const getMonitorsOnlyId = async (userId) => {
+  let monitors;
+  try {
     monitors = await Monitor.findMany({
-      where:{
-        serverOwner: {id: userId} 
+      where: {
+        serverOwner: { id: userId },
       },
-      select:{
-        id: true
-      }
-    })
- }
- catch(error){
-  console.log("Error fetching  Id:", error);
+      select: {
+        id: true,
+      },
+    });
+  } catch (error) {
+    console.log("Error fetching  Id:", error);
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       "Error fetching monitors Id"
     );
- }
- return monitors.map(obj => obj.id);
-}
+  }
+  return monitors.map((obj) => obj.id);
+};
 
-const updateMonitorsByIds = async(ids, updateBody) =>{
-  try{
+const updateMonitorsByIds = async (ids, updateBody) => {
+  try {
     const monitors = await Monitor.updateMany({
-    where:{
-      id:{
-        in:ids
-      }
-    },
-    data: updateBody
-  })
-  return monitors
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      data: updateBody,
+    });
+    return monitors;
+  } catch (error) {
+    console.log(error);
+    return new ApiError(httpStatus[500], "Güncelleme yapılırken hata oluştu !");
   }
-  catch(error){
-     console.log(error)
-     return new ApiError(httpStatus[500], 'Güncelleme yapılırken hata oluştu !')
-  }
-  
-}
+};
 
-const deleteMonitorsByIds = async(ids) =>{
-  try{
+const deleteMonitorsByIds = async (ids) => {
+  try {
     const monitors = await Monitor.deleteMany({
-    where:{
-      id:{
-        in: ids
-      }
-    }
-  })
-  return monitors
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+    return monitors;
+  } catch (error) {
+    console.log(error);
+    return new ApiError(
+      httpStatus[500],
+      "Silme işlemler yapılırken hata oluştu !"
+    );
   }
-  catch(error){
-     console.log(error)
-     return new ApiError(httpStatus[500], 'Silme işlemler yapılırken hata oluştu !')
-  }
-  
-}
+};
 
-const monitorUpdateAfterTask = async(monitor)=>{
+const monitorUpdateAfterTask = async (monitor) => {
   try {
     await updateMonitorById(monitor.id, {
-        status: monitor.status,
-        isProcess: monitor.isProcess,
-        controlTime: monitor.controlTime,
-        failCount: monitor.failCount,
+      status: monitor.status,
+      isProcess: monitor.isProcess,
+      controlTime: monitor.controlTime,
+      failCount: monitor.failCount,
     });
   } catch (error) {
     console.log("Error updating monitor after task:", error);
   }
-  
-}
+};
 
 const getMonitorsNamesAndIDs = async (userId) => {
   try {
@@ -589,6 +584,7 @@ const getMonitorsNamesAndIDs = async (userId) => {
       select: {
         id: true,
         name: true,
+        monitorType: true,
       },
     });
     return monitors;
@@ -597,8 +593,9 @@ const getMonitorsNamesAndIDs = async (userId) => {
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       "Error fetching monitors names and IDs"
-    );}
-}
+    );
+  }
+};
 module.exports = {
   createMonitor,
   getMonitor,
