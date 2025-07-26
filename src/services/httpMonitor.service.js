@@ -11,6 +11,8 @@ const createHttpMonitor = async (monitorBody, userId) => {
     monitorType: "HttpMonitor",
     interval: monitorBody.interval,
     intervalUnit: monitorBody.intervalUnit,
+    failCount: monitorBody.failCountRef,
+    failCountRef: monitorBody.failCountRef,
   };
   httpMonitor = await HttpMonitor.findFirst({
     where: {
@@ -106,6 +108,7 @@ const getHttpMonitorFullDataById = async (id) => {
 const updateHttpMonitorById = async (id, updateData) => {
   const httpBody = updateData.httpMonitor;
   delete updateData.httpMonitor;
+  updateData.failCount = updateData.failCountRef;
   const monitorBody = updateData;
   let httpMonitor = await getHttpMonitorById(id);
   if (!httpMonitor) {

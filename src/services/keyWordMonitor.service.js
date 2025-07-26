@@ -11,7 +11,9 @@ const createKeyWordMonitor = async(monitorBody,userId) =>{
     name: monitorBody.name,
     monitorType: 'KeywordMonitor',
     interval: monitorBody.interval,
-    intervalUnit: monitorBody.intervalUnit
+    intervalUnit: monitorBody.intervalUnit,
+    failCount: monitorBody.failCountRef,
+    failCountRef: monitorBody.failCountRef,
   }
   keyWordMonitor = await KeyWordMonitor.findFirst({
     where:{
@@ -89,6 +91,7 @@ const getKeyWordMonitorFullDataById = async(id) =>{
             name: true,
             interval: true,
             intervalUnit: true,
+            failCountRef: true,
             notifications: {
               select: {
                 emails: true,
@@ -109,6 +112,7 @@ const getKeyWordMonitorFullDataById = async(id) =>{
 const updateKeyWordMonitorById = async(id, updateData) => {
    let keyWordBody = updateData.keyWordMonitor;
    delete updateData.keyWordMonitor;
+   updateData.failCount = updateData.failCountRef;
    const monitorBody = updateData;
    let keyWordMonitor = await getKeyWordMonitorById(id);
    if(!keyWordMonitor){

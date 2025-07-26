@@ -91,6 +91,7 @@ const createMonitor = {
         then: joi.number().min(1).max(23),
       }),
     intervalUnit: joi.string().valid("seconds", "minutes", "hours").required(),
+    failCountRef: joi.number().min(1).required(),
   }),
 };
 
@@ -188,6 +189,7 @@ const updateMonitor = {
         then: joi.number().min(1).max(23),
       }),
     intervalUnit: joi.string().valid("seconds", "minutes", "hours").required(),
+    failCountRef: joi.number().min(1).required(),
   }),
 };
 

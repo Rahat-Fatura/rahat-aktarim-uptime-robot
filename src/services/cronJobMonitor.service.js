@@ -18,6 +18,8 @@ const createCronJobMonitor = async (monitorBody, userId) => {
     monitorType: "CronJobMonitor",
     interval: monitorBody.interval,
     intervalUnit: monitorBody.intervalUnit,
+    failCount: monitorBody.failCountRef,
+    failCountRef: monitorBody.failCountRef,
   };
   try {
     monitor = await monitorService.createMonitor(body, userId);
@@ -66,6 +68,7 @@ const getCronJobMonitorById = async (id) => {
 const updateCronJobMonitorById = async (id, updateData) => {
   const cronJobBody = updateData.cronJobMonitor;
   delete updateData.cronJobMonitor;
+  updateData.failCount = updateData.failCountRef;
   const monitorBody = updateData;
   let cronJobMonitor = await getCronJobMonitorById(id);
   if (!cronJobMonitor) {
@@ -113,6 +116,7 @@ const getCronJobMonitorFullDataById = async(id) =>{
             name: true,
             interval: true,
             intervalUnit: true,
+            failCountRef: true,
             notifications: {
               select: {
                 emails: true,

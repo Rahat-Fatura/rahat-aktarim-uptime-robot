@@ -11,7 +11,9 @@ const createPortMonitor = async(monitorBody,userId) => {
     name: monitorBody.name,
     monitorType: 'PortMonitor',
     interval: monitorBody.interval,
-    intervalUnit: monitorBody.intervalUnit
+    intervalUnit: monitorBody.intervalUnit,
+    failCount: monitorBody.failCountRef,
+    failCountRef: monitorBody.failCountRef,
   }
   portMonitor = await PortMonitor.findFirst({
     where:{
@@ -79,6 +81,7 @@ const getPortMonitorFullDataById = async(id) =>{
             name: true,
             interval: true,
             intervalUnit: true,
+            failCountRef: true,
             notifications: {
               select: {
                 emails: true,
@@ -99,6 +102,7 @@ const getPortMonitorFullDataById = async(id) =>{
 const updatePortMonitorById = async(id, updateData) => {
   const portBody = updateData.portMonitor;
   delete updateData.portMonitor;
+  updateData.failCount = updateData.failCountRef;
   const monitorBody = updateData;
   let monitor;
   let portMonitor = await getPortMonitorById(id);

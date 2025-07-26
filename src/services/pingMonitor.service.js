@@ -10,7 +10,9 @@ const createPingMonitor = async(monitorBody,userId) => {
     name: monitorBody.name,
     monitorType: 'PingMonitor',
     interval: monitorBody.interval,
-    intervalUnit: monitorBody.intervalUnit
+    intervalUnit: monitorBody.intervalUnit,
+    failCount: monitorBody.failCountRef,
+    failCountRef: monitorBody.failCountRef,
   }
   pingMonitor = await PingMonitor.findFirst({
     where:{
@@ -60,6 +62,7 @@ const getPingMonitorById = async(id) =>{
 const updatePingMonitorById = async(id, updateData) => {
   const pingBody = updateData.pingMonitor;
   delete updateData.pingMonitor;
+  updateData.failCount = updateData.failCountRef;
   const monitorBody = updateData;
   let monitor;
   let pingMonitor = await getPingMonitorById(id);
@@ -90,6 +93,7 @@ const getPingMonitorFullDataById = async(id) =>{
             name: true,
             interval: true,
             intervalUnit: true,
+            failCountRef: true,
             notifications: {
               select: {
                 emails: true,
