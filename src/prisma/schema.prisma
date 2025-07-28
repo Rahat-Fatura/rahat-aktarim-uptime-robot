@@ -55,7 +55,7 @@ model Monitor {
   notifications      Notification?
   failCount          Int?        @default(3)
   failCountRef       Int?        @default(3)
-  monitorProcessLocation   ProcessLocation  @default("database")   
+  monitorProcessLocation   ProcessLocation?  @default(database)   
 }
 
 model HttpMonitor {
