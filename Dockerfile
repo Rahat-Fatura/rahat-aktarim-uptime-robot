@@ -1,17 +1,10 @@
-FROM node:22.14.0
+FROM rabbitmq:3.12-management
 
-# Uygulama dizini
-WORKDIR /app
+# Plugin dosyasını ekle
+ADD rabbitmq_delayed_message_exchange-3.12.0.ez /plugins/
 
-# package.json ve package-lock.json kopyala ve yükle
-COPY package*.json ./
-RUN npm install
+# Plugin klasörüne taşı
+RUN mv /plugins/rabbitmq_delayed_message_exchange-3.12.0.ez /opt/rabbitmq/plugins/
 
-# Geri kalan dosyaları (app.js, routes, models, vs.) kopyala
-COPY . .
-
-# Uygulama portu
-EXPOSE 3000
-
-# Uygulama başlat
-CMD ["npm","run","start"]
+# Plugin'i etkinleştir
+RUN rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange
