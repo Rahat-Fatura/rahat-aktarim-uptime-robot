@@ -1,10 +1,10 @@
-const amqplib = require("amqplib");
+const getRabbitConnection = require('../rabbitConnection');
 const { portTask } = require("../tasks/portTask");
 
 const portMonitorTask = async() =>{
     try{
         const queueName = 'port_monitor_queue';
-        const connection = await amqplib.connect("amqp://localhost:5672");
+        const connection = await getRabbitConnection();
         const channel = await connection.createChannel();
         //await channel.deleteQueue(queueName);
         const assertion = await channel.assertQueue(queueName);

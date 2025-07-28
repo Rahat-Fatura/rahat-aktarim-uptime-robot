@@ -1,11 +1,11 @@
 const cron = require('node-cron');
 const { monitorService } = require('../services');
-const amqplib = require('amqplib');
+const getRabbitConnection = require('./rabbitConnection');
 
 const renderMonitor = async()=>{
   let channel;
   try{
-    const connection = await amqplib.connect("amqp://localhost:5672");
+    const connection = await getRabbitConnection();
     channel = await connection.createChannel();
     //await channel.deleteQueue("monitor_parser_queue")
     await channel.assertQueue("monitor_parser_queue");

@@ -54,7 +54,8 @@ model Monitor {
   controlTime        DateTime   
   notifications      Notification?
   failCount          Int?        @default(3)
-  failCountRef       Int?        @default(3)  
+  failCountRef       Int?        @default(3)
+  monitorProcessLocation   ProcessLocation  @default("database")   
 }
 
 model HttpMonitor {
@@ -199,4 +200,15 @@ enum KeyWordType {
   txt
   html
   json
+}
+
+enum ProcessLocation {
+  database
+  mainQueue
+  httpQueue
+  pingQueue
+  portQueue
+  keywordQueue
+  cronjobQueue
+  maintananceQueue
 }

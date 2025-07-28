@@ -1,4 +1,4 @@
-const amqplib = require("amqplib");
+const getRabbitConnection = require('./rabbitConnection');
 
 const monitorParser = async () => {
   try {
@@ -9,7 +9,7 @@ const monitorParser = async () => {
       keywordMonitor: "keyword_monitor_queue",
       cronJobMonitor: "cron_job_monitor_queue",
     };
-    const connection = await amqplib.connect("amqp://localhost:5672");
+    const connection = await getRabbitConnection();
 
     const consumeChannel = await connection.createChannel();
     const producerChannel = await connection.createChannel();
@@ -28,6 +28,7 @@ const monitorParser = async () => {
       consumeChannel.ack(monitors);
       monitors = JSON.parse(monitors.content.toString());
       monitors.map((monitor) => {
+        console.log("Monitor parser: ", monitor)
         switch (monitor.monitorType) {
           case "HttpMonitor": {
             producerChannel.sendToQueue(

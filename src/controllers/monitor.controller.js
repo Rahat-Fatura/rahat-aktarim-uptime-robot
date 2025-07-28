@@ -12,13 +12,13 @@ const { renderMonitor } = require('../Jobs/renderMonitor');
 const { monitorParser } = require('../Jobs/monitorParser');
 const { reportTaskWorker } = require('../Jobs/reportTaskWorker');
 const { reportJobRender } = require('../Jobs/reportJobRender');
+console.log("Global:", global)
 
 monitorService.staytedsInQueue();
 reportJobRender();
 reportTaskWorker();
 renderMonitor();
 monitorParser();
-
 const createMonitor = catchAsync(async (req, res) => {
   let now = new Date();
   let monitor = await monitorService.createMonitor(req.body, req.user);
@@ -148,7 +148,6 @@ const sentRequestInstantControlMonitor = catchAsync(async (req, res) =>  {
 });
 
 const getMonitorsNamesAndIDs = catchAsync(async (req, res) => {
-  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
   const monitors = await monitorService.getMonitorsNamesAndIDs(req.user.id);
   if (!monitors) {
     throw new Error('Monitors not found');

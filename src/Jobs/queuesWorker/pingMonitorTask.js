@@ -1,10 +1,10 @@
-const amqplib = require("amqplib");
+const getRabbitConnection = require('../rabbitConnection');
 const { pingTask } = require("../tasks/pingTask");
 
 const pingMonitorTask = async() =>{
     try{
         const queueName = 'ping_monitor_queue';
-        const connection = await amqplib.connect("amqp://localhost:5672");
+        const connection = await getRabbitConnection();
         const channel = await connection.createChannel();
         //await channel.deleteQueue(queueName);
         const assertion = await channel.assertQueue(queueName);

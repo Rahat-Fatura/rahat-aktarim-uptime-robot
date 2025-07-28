@@ -1,10 +1,10 @@
-const amqplib = require("amqplib");
+const getRabbitConnection = require('./rabbitConnection');
 const { reportTask } = require('./tasks/reportTask');
 
 const reportTaskWorker = async() => {
     let channel;
     try{
-        const connect = await amqplib.connect("amqp://localhost:5672");
+        const connect = await getRabbitConnection();
         channel = await connect.createChannel();
         await channel.assertQueue("monitor_report_queue");
         channel.consume("monitor_report_queue",(monitor) =>{
