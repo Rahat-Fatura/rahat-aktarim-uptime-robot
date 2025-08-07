@@ -51,7 +51,6 @@ if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
   app.use('/v1/heartbeat', heartBeatLimiter);
 }
-
 // v1 api routes
 app.use('/v1', routes);
 // send back a 404 error for any unknown api request
