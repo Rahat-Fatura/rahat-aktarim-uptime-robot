@@ -78,6 +78,7 @@ const cronJobMonitor = catchAsync(async (req, res) => {
     monitor.lastRequestTime === null ||
     monitor.lastRequestTime === undefined
   ) {
+    data = controlRequestTime(monitor, monitorBody.controlTime);
     monitor.lastRequestTime = now;
     let controlTime = new Date(
       now.getTime() +
@@ -87,13 +88,17 @@ const cronJobMonitor = catchAsync(async (req, res) => {
     await monitorService.updateMonitorById(monitor.id, {
       controlTime: controlTime,
     });
+    monitor = await cronJobMonitorService.cronJobMonitorHeartBeat(
+      monitor.id,
+      now
+    );
+  }else{
+    monitor = await cronJobMonitorService.cronJobMonitorHeartBeat(
+      monitor.id,
+      now
+    );
+    data = controlRequestTime(monitor, monitorBody.controlTime);
   }
-  monitor = await cronJobMonitorService.cronJobMonitorHeartBeat(
-    monitor.id,
-    now
-  );
-  data = controlRequestTime(monitor, monitorBody.controlTime);
-
   res.status(httpStatus.OK).send(data);
 });
 

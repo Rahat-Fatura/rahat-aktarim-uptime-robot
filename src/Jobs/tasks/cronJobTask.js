@@ -12,12 +12,13 @@ async function cronJobTask(monitor) {
     monitor = await monitorService.getMonitorWithBodyForTask(monitor.id);
     let now = new Date();
     now.setMilliseconds(0);
+    const time = monitor.controlTime;
     monitor.controlTime = new Date(
       now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
     );
     if (monitor.cronJobMonitor.lastRequestTime != null) {
       let cronJobMonitor = monitor.cronJobMonitor;
-      const result = controlRequestTime(cronJobMonitor, monitor.controlTime);
+      const result = controlRequestTime(cronJobMonitor, time);
       if (!result.isError) {
         if (monitor.status === "down" || monitor.status === "uncertain") {
           try {

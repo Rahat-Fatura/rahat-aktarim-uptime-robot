@@ -4,7 +4,7 @@ const router = express.Router();
 const monitorController = require('../../controllers/monitor.controller');
 const cronJobController = require('../../controllers/cronJobMonitor.controller');
 const validate = require('../../middlewares/validate');
-const { accessToMonitor, accessToCronJob, accessToMonitors } = require('../../middlewares/monitor');
+const { accessToMonitor, accessToMonitors } = require('../../middlewares/monitor');
 const monitorValidate = require('../../validations/monitor.validation');
 
 const httpMonitor = require("./monitorRoutes/httpMonitor.route");
@@ -24,7 +24,6 @@ router.use('/port', auth('getUsers'), portMonitor);
 router.use('/cronjob', auth('getUsers'), cronJobMonitor);
 router.use('/maintanance',auth('getUsers'), maintanance);
 router.use('/admin',auth('manageUsers'), admin);
-router.get("/heartbeat/:token",accessToCronJob(), cronJobController.cronJobMonitor);
 router.get('/', auth('getUsers'), monitorController.getMonitor);
 
 router.get('/namesAndIDs',auth('getUsers'), monitorController.getMonitorsNamesAndIDs);

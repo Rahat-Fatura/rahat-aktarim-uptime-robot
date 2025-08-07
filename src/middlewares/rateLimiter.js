@@ -6,6 +6,13 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
 });
 
+const heartBeatLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 10,
+  skipSuccessfulRequests: true,
+});
+
 module.exports = {
   authLimiter,
+  heartBeatLimiter
 };
