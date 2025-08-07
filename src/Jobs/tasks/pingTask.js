@@ -9,7 +9,12 @@ const { cronExprension } = require("../utils/taskUtils");
 
 const pingTask = async (monitor) => {
   try {
-    monitor = await monitorService.getPingMonitorWithBody(monitor.id);
+    monitor = await monitorService.getMonitorWithBodyForTask(monitor.id);
+    let now = new Date();
+      now.setMilliseconds(0);
+      monitor.controlTime = new Date( 
+        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
+    );
     const pingMonitor = monitor.pingMonitor;
     const result = await sendPing(pingMonitor);
     if (!result.isError) {
@@ -35,10 +40,6 @@ const pingTask = async (monitor) => {
       monitor.failCount = monitor.failCountRef;
       monitor.status = "up";
       monitor.isProcess = false;
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     } else {
@@ -67,10 +68,6 @@ const pingTask = async (monitor) => {
 
       monitor.isProcess = false;
       monitor.status = "down";
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     }

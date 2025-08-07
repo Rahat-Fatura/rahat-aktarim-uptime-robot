@@ -12,7 +12,12 @@ const he = require("he");
 
 async function keyWordTask(monitor) {
   try {
-    monitor = await monitorService.getKeyWordMonitorWithBody(monitor.id);
+    monitor = await monitorService.getMonitorWithBodyForTask(monitor.id);
+    let now = new Date();
+      now.setMilliseconds(0);
+      monitor.controlTime = new Date( 
+        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
+    );
     const keyWordMonitor = monitor.keyWordMonitor;
     const result = await sendRequestAndControlKey(keyWordMonitor);
     if (!result.isError) {
@@ -39,10 +44,6 @@ async function keyWordTask(monitor) {
       monitor.failCount = monitor.failCountRef;
       monitor.status = "up";
       monitor.isProcess = false;
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     } else {
@@ -71,10 +72,6 @@ async function keyWordTask(monitor) {
 
       monitor.isProcess = false;
       monitor.status = "down";
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     }

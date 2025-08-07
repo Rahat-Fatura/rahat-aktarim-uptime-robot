@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { httpMonitorService, monitorService } = require('../services');
-const { monitorTask } = require('../Jobs/tasks/monitorTask');
 const { cronExprension } = require('../Jobs/utils/taskUtils');
 const { httpMonitorTask } = require('../Jobs/queuesWorker/httpMonitorTask');
 
@@ -9,13 +8,11 @@ httpMonitorTask();
 
 const createMonitor = catchAsync(async (req, res) => {
   const monitor = await httpMonitorService.createHttpMonitor(req.body,req.user.id);
-  monitorTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
 
 const adminCreateMonitor = catchAsync(async (req, res) => {
   const monitor = await httpMonitorService.createHttpMonitor(req.body,req.params.userId);
-  monitorTask(monitor);
   res.status(httpStatus.CREATED).send(monitor);
 });
 
@@ -28,16 +25,9 @@ const updateMonitor = catchAsync(async (req, res) => {
   const updateData = req.body;
   let now = new Date();
   let monitorBody = await monitorService.getMonitorById(req.params.id);
-  if(updateData.interval === monitorBody.interval && updateData.intervalUnit === monitorBody.intervalUnit){
-
+  if(updateData.interval != monitorBody.interval || updateData.intervalUnit != monitorBody.intervalUnit){
+      updateData.controlTime = now;
   }
-  else{
-      updateData.controlTime = new Date(
-        now.getTime() +
-        cronExprension(updateData.interval,updateData.intervalUnit)
-      ) 
-  }
-
   let monitor = await httpMonitorService.updateHttpMonitorById(req.params.id, updateData);
   res.status(httpStatus.OK).send(monitor);
 });

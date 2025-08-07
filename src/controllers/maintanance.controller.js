@@ -1,8 +1,8 @@
-const httpStatus = require('http-status');
-const catchAsync = require('../utils/catchAsync');
-const { monitorService, maintananceService } = require('../services');
-const { maintananceJob } = require('../Jobs/maintananceJob');
-const { maintananceWorker } = require('../Jobs/maintanaceWorker');
+const httpStatus = require("http-status");
+const catchAsync = require("../utils/catchAsync");
+const { monitorService, maintananceService } = require("../services");
+const { maintananceJob } = require("../Jobs/maintananceJob");
+const { maintananceWorker } = require("../Jobs/maintanaceWorker");
 
 maintananceJob();
 maintananceWorker();
@@ -10,7 +10,7 @@ maintananceWorker();
 const getMaintananceMonitor = catchAsync(async (req, res) => {
   let monitors = await monitorService.getMaintenance(req.user.id);
   if (!monitors) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
   res.status(httpStatus.OK).send(monitors);
 });
@@ -18,35 +18,37 @@ const getMaintananceMonitor = catchAsync(async (req, res) => {
 const getAdminMaintananceMonitor = catchAsync(async (req, res) => {
   let monitors = await monitorService.getMaintenance(req.params.userId);
   if (!monitors) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
   res.status(httpStatus.OK).send(monitors);
 });
 
 const createMaintananceMonitor = catchAsync(async (req, res) => {
   let monitor = await monitorService.getMonitorById(req.params.id, true);
-  let maintanance=null;
+  let maintanance = null;
   if (monitor.maintanance) {
-    if(monitor.maintanance.status){
-      await monitorService.updateMonitorById(req.params.id, {
-         isProcess: false,
-         status: 'uncertain'
-      });
+    if (!monitor.maintanance.status) {
+      const body = {
+        startTime: req.body.startTime,
+        endTime: req.body.endTime,
+        timeZone: req.body.timeZone,
+        controlTime: req.body.startTime,
+        status: true,
+      };
+      maintanance = await maintananceService.updateMaintananceById(
+        monitor.maintanance.id,
+        body
+      );
     }
-    const body = {
-      startTime: req.body.startTime,
-      endTime: req.body.endTime,
-      controlTime: req.body.startTime,
-      status: true,
-    }
-    maintanance = await maintananceService.updateMaintananceById(monitor.maintanance.id, body);
+  } else {
+    maintanance = await maintananceService.createMaintanance(
+      req.params.id,
+      req.body
+    );
   }
-  else{
-    maintanance = await maintananceService.createMaintanance(req.params.id, req.body);
-  }
-  
+
   if (!maintanance) {
-    throw new Error('Maintanance not created');
+    throw new Error("Maintanance not created");
   }
 
   monitor = await monitorService.getMonitorById(maintanance.id, false);
@@ -58,31 +60,35 @@ const createMaintananceMonitor = catchAsync(async (req, res) => {
     maintanance: {
       startTime: maintanance.startTime,
       endTime: maintanance.endTime,
+      timeZone: maintanance.timeZone,
       status: maintanance.status,
     },
-   }
+  };
 
   res.status(httpStatus.OK).send(response);
 });
 
 const stopMaintanance = catchAsync(async (req, res) => {
-   const body = {
+  const body = {
     startTime: new Date(),
     endTime: new Date(),
     controlTime: new Date(),
     status: false,
-   }
-   const monitor = await monitorService.getMonitorById(req.params.id, true);
-    if (!monitor) {
-      throw new Error('Monitor not found');
-    }
-   const maintananceId = monitor.maintanance.id;
-   const maintanance = await maintananceService.updateMaintananceById(maintananceId, body);
-   await monitorService.updateMonitorById(req.params.id, {
+  };
+  const monitor = await monitorService.getMonitorById(req.params.id, true);
+  if (!monitor) {
+    throw new Error("Monitor not found");
+  }
+  const maintananceId = monitor.maintanance.id;
+  const maintanance = await maintananceService.updateMaintananceById(
+    maintananceId,
+    body
+  );
+  await monitorService.updateMonitorById(req.params.id, {
     status: "uncertain",
     isProcess: false,
-   });
-   const response = {
+  });
+  const response = {
     id: monitor.id,
     name: monitor.name,
     host: monitor.host,
@@ -92,8 +98,8 @@ const stopMaintanance = catchAsync(async (req, res) => {
       endTime: maintanance.endTime,
       status: maintanance.status,
     },
-   }
-   res.status(httpStatus.OK).send(response);
+  };
+  res.status(httpStatus.OK).send(response);
 });
 
 module.exports = {

@@ -9,16 +9,22 @@ const { cronExprension } = require("../utils/taskUtils");
 
 async function cronJobTask(monitor) {
   try {
-    monitor = await monitorService.getCronJobMonitorWithBody(monitor.id);
-    let cronJobMonitor = monitor.cronJobMonitor;
-    const result = controlRequestTime(cronJobMonitor, monitor.controlTime);
-    if (!result.isError) {
-      if (monitor.status === "down" || monitor.status === "uncertain") {
-        try {
-          await emailService.sendEmail(
-            `<${monitor.serverOwner.email}>`,
-            `Monitor is UP. ${monitor.monitorType} on ${cronJobMonitor.host}`,
-            `Merhaba ${monitor.serverOwner.name},
+    monitor = await monitorService.getMonitorWithBodyForTask(monitor.id);
+    let now = new Date();
+    now.setMilliseconds(0);
+    monitor.controlTime = new Date(
+      now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
+    );
+    if (monitor.cronJobMonitor.lastRequestTime != null) {
+      let cronJobMonitor = monitor.cronJobMonitor;
+      const result = controlRequestTime(cronJobMonitor, monitor.controlTime);
+      if (!result.isError) {
+        if (monitor.status === "down" || monitor.status === "uncertain") {
+          try {
+            await emailService.sendEmail(
+              `<${monitor.serverOwner.email}>`,
+              `Monitor is UP. ${monitor.monitorType} on ${cronJobMonitor.host}`,
+              `Merhaba ${monitor.serverOwner.name},
             Rahat Up izleme sistemine eklediğiniz servisine erişim denemesi başarıyla sonuçlandı.
             📌 Servis Bilgileri:
                 Servis Adı: ${monitor.name}
@@ -29,28 +35,24 @@ async function cronJobTask(monitor) {
                 Yardım veya sorularınız için bize +90542 315 88 12 numara üzerinden ulaşabilirsiniz.
                 Saygılarımızla,
                 Rahat Up Ekibi`
-          );
-        } catch (error) {
-          console.log(error);
+            );
+          } catch (error) {
+            console.log(error);
+          }
         }
-      }
-      monitor.failCount = monitor.failCountRef;
-      monitor.status = "up";
-      monitor.isProcess = false;
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
-      await monitorLogService.createLog(monitor, result);
-      await monitorService.monitorUpdateAfterTask(monitor);
-    } else {
-      monitor.failCount--;
-      if (monitor.failCount === 0) {
-        try {
-          await emailService.sendEmail(
-            `<${monitor.serverOwner.email}>`,
-            `Monitor is DOWN. ${monitor.monitorType} on ${cronJobMonitor.host}`,
-            `Merhaba ${monitor.serverOwner.name},
+        monitor.failCount = monitor.failCountRef;
+        monitor.status = "up";
+        monitor.isProcess = false;
+        await monitorLogService.createLog(monitor, result);
+        await monitorService.monitorUpdateAfterTask(monitor);
+      } else {
+        monitor.failCount--;
+        if (monitor.failCount === 0) {
+          try {
+            await emailService.sendEmail(
+              `<${monitor.serverOwner.email}>`,
+              `Monitor is DOWN. ${monitor.monitorType} on ${cronJobMonitor.host}`,
+              `Merhaba ${monitor.serverOwner.name},
             Rahat Up izleme sistemimiz, aşağıdaki servisinize şu anda erişim sağlanamadığını tespit etti:
             📌 Servis Bilgileri:
                 Servis Adı: ${monitor.name}
@@ -62,18 +64,18 @@ async function cronJobTask(monitor) {
                 Yardım veya sorularınız için bize +90542 315 88 12 numara üzerinden ulaşabilirsiniz.
                 Saygılarımızla,
                 Rahat Up Ekibi`
-          );
-        } catch (error) {
-          console.log(error);
+            );
+          } catch (error) {
+            console.log(error);
+          }
         }
+        monitor.isProcess = false;
+        monitor.status = "down";
+        await monitorLogService.createLog(monitor, result);
+        await monitorService.monitorUpdateAfterTask(monitor);
       }
+    } else {
       monitor.isProcess = false;
-      monitor.status = "down";
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
-      await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     }
   } catch (error) {
@@ -87,9 +89,10 @@ const controlRequestTime = (cronJobMonitor, controlTime) => {
   );
   if (cronJobMonitor.lastRequestTime === null) {
     return {
-      isError: true,
-      message: "Your CronJob Monitor is not active",
-      status: "inactive time",
+      isError: false,
+      message:
+        "Your CronJob Monitor is now started. Please insert the generated URL into the cronjob!",
+      status: "started time",
       isActiveByOwner: false,
       controlTime: controlTime,
     };

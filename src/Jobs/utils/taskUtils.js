@@ -19,17 +19,20 @@ function isoToCron(isoDate) {
 const cronExprension = (time, timeUnit) => {
   switch (timeUnit) {
     case 'seconds': {
-      if (time > 59) {
-        time = 59;
-      }
-      if (time < 20) {
+      if (time < 21) {
         time = 20;
+      }
+      if(time > 20 && time < 41){
+        time = 40;
+      }
+      if(time>40){
+        time = 60;
       }
       return (time*1000);
     }
     case 'minutes': {
       if (time > 59) {
-        time = 59;
+        time = 60;
       }
       if (time < 1) {
         time = 1;

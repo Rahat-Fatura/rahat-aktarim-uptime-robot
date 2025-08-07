@@ -10,7 +10,6 @@ const {
 const { cronExprension } = require("../Jobs/utils/taskUtils");
 
 const createCronJobMonitor = async (monitorBody, userId) => {
-  let controlTime;
   let cronJobMonitor;
   let monitor;
   const body = {
@@ -23,13 +22,6 @@ const createCronJobMonitor = async (monitorBody, userId) => {
   };
   try {
     monitor = await monitorService.createMonitor(body, userId);
-    // controlTime = new Date(
-    //   monitor.controlTime.getTime() +
-    //     cronExprension(monitorBody.cronJobMonitor.devitionTime, "minutes"),
-    // );
-    await monitorService.updateMonitorById(monitor.id, {
-      isProcess: true
-    });
     const token = generateTokenForHeartBeat(monitor.id);
     const devToken = token.split(".")[1] + "." + token.split(".")[2];
     const url = `${config.app.heartbeatUrl}` + devToken;

@@ -133,7 +133,9 @@ model Maintanance {
   startTime   DateTime
   endTime     DateTime
   controlTime DateTime
+  timeZone    String?    @default("Europe/Istanbul")
   status      Boolean
+  inActiveTime Boolean? @default(false)
   monitor     Monitor @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 

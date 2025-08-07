@@ -9,7 +9,12 @@ const { cronExprension } = require("../utils/taskUtils");
 
 const portTask = async (monitor) => {
   try {
-    monitor = await monitorService.getPortMonitorWithBody(monitor.id);
+    monitor = await monitorService.getMonitorWithBodyForTask(monitor.id);
+    let now = new Date();
+      now.setMilliseconds(0);
+      monitor.controlTime = new Date( 
+        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
+    );
     let portMonitor = monitor.portMonitor;
     const result = await controlPort(portMonitor);
     if (!result.isError) {
@@ -35,10 +40,6 @@ const portTask = async (monitor) => {
       monitor.failCount = monitor.failCountRef;
       monitor.status = "up";
       monitor.isProcess = false;
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     } else {
@@ -66,10 +67,6 @@ const portTask = async (monitor) => {
 
       monitor.isProcess = false;
       monitor.status = "down";
-      const now = new Date();
-      monitor.controlTime = new Date(
-        now.getTime() + cronExprension(monitor.interval, monitor.intervalUnit)
-      );
       await monitorLogService.createLog(monitor, result);
       await monitorService.monitorUpdateAfterTask(monitor);
     }

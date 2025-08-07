@@ -37,7 +37,13 @@ router.get(
   monitorController.getMonitorById,
 );
 
-
+router.get(
+  '/update/:id',
+  auth('getUsers'),
+  accessToMonitor(),
+  validate(monitorValidate.getMonitorById),
+  monitorController.getMonitorForEdit,
+);
 
 router.get(
   '/logs',

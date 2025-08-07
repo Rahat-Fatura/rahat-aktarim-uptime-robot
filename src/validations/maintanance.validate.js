@@ -23,6 +23,11 @@ const monitorMaintenance = {
         'date.base': 'endTime geçerli bir tarih olmalı',
         'date.min': 'endTime, startTime\'dan en az 5 dakika sonra olmalı',
         'any.required': 'endTime zorunlu bir alan'
+      }),
+      timeZone: joi.string().required().disallow('', null).messages({
+        'any.required': `"timeZone" alanı zorunludur.`,
+        'string.empty': `"timeZone" boş bırakılamaz.`,
+        'any.invalid': `"timeZone" null olamaz.`,
       })
   })
 };

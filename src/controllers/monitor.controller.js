@@ -35,6 +35,11 @@ const getMonitorById = catchAsync(async (req, res) => {
   res.status(httpStatus.OK).send(monitor);
 });
 
+const getMonitorForEdit = catchAsync(async (req, res) => {
+  const monitor = await monitorService.getMonitorForEdit(req.params.id);
+  res.status(httpStatus.OK).send(monitor);
+});
+
 const getUserMonitors = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.params.userId);
   monitors.map(monitor =>{
@@ -171,5 +176,6 @@ module.exports = {
   deleteMonitors,
   pauseMonitors,
   playMonitors,
-  getMonitorsNamesAndIDs
+  getMonitorsNamesAndIDs,
+  getMonitorForEdit
 };
