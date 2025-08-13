@@ -21,6 +21,8 @@ const createMonitor = {
             return helpers.error("any.invalid");
           }, "IP or Hostname validation")
           .required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required(),
       })
     .required(),
     interval: joi
@@ -68,6 +70,8 @@ const updateMonitor = {
             return helpers.error("any.invalid");
           }, "IP or Hostname validation")
           .required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required(),
       })
       .required(),
     interval: joi

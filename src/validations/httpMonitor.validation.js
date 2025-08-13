@@ -21,7 +21,9 @@ const createMonitor = {
         if (num < 100 || num >= 600) return helpers.error('number.range');
         return value;
       },'Check string as number in range')),
-      timeOut: joi.number().min(1).max(60)
+       timeOut: joi.number().min(1).max(60).required(),
+       slowResponseAlertStatus: joi.boolean().required(),
+       slowResponseAlertValue: joi.number().integer().required()
     }).required(),
     interval: joi
       .number()
@@ -68,7 +70,9 @@ const updateMonitor = {
         if (num < 100 || num >= 600) return helpers.error('number.range');
         return value;
       },'Check string as number in range')),
-      timeOut: joi.number().min(1).max(60)
+      timeOut: joi.number().min(1).max(60).required(),
+      slowResponseAlertStatus: joi.boolean().required(),
+      slowResponseAlertValue: joi.number().integer().required()
     }).required(),
     interval: joi
       .number()

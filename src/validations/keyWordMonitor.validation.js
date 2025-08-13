@@ -71,7 +71,9 @@ const createMonitor = {
               .required(),
           },
         ]),
-        timeOut: joi.number().min(1).max(60),
+        timeOut: joi.number().min(1).max(60).required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required(),
       })
       .required(),
     interval: joi
@@ -169,7 +171,9 @@ const updateMonitor = {
               .required(),
           },
         ]),
-        timeOut: joi.number().min(1).max(60),
+        timeOut: joi.number().min(1).max(60).required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required()
       })
       .required(),
     interval: joi

@@ -29,7 +29,9 @@ const createMonitor = {
           }, "IP or Hostname validation")
           .required(),
         port: joi.number().integer().min(1).max(65535).required(),
-        timeOut: joi.number().min(1).max(60)
+        timeOut: joi.number().min(1).max(60).required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required(),
       })
       .required(),
     interval: joi
@@ -85,7 +87,9 @@ const updateMonitor = {
           }, "IP or Hostname validation")
           .required(),
         port: joi.number().integer().min(1).max(65535).required(),
-        timeOut: joi.number().min(1).max(60)
+        timeOut: joi.number().min(1).max(60).required(),
+        slowResponseAlertStatus: joi.boolean().required(),
+        slowResponseAlertValue: joi.number().integer().required(),
       })
       .required(),
     interval: joi

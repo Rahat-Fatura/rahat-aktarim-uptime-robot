@@ -55,7 +55,7 @@ model Monitor {
   notifications      Notification?
   failCount          Int?        @default(3)
   failCountRef       Int?        @default(3)
-  monitorProcessLocation   ProcessLocation?  @default(database)   
+  monitorProcessLocation   ProcessLocation?  @default(database)  
 }
 
 model HttpMonitor {
@@ -63,9 +63,11 @@ model HttpMonitor {
   host               String
   method             MethodType     
   body               Json?
-  headers            Json?
+  headers            Json? 
   allowedStatusCodes String[]   @default([])
   timeOut            Int        @default(30)
+  slowResponseAlertStatus  Boolean?  @default(false)
+  slowResponseAlertValue   Int?       @default(1000) 
   userId             Int   
   monitor            Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
   @@unique([userId, host, method])
@@ -74,6 +76,8 @@ model HttpMonitor {
 model PingMonitor {
   id   Int   @id
   host       String
+  slowResponseAlertStatus  Boolean?  @default(false)
+  slowResponseAlertValue   Int?       @default(1000) 
   userId     Int
   monitor    Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
   @@unique([userId, host])
@@ -84,6 +88,8 @@ model PortMonitor {
   host   String
   port Int
   timeOut    Int  @default(30)
+  slowResponseAlertStatus  Boolean?  @default(false)
+  slowResponseAlertValue   Int?       @default(1000) 
   userId   Int 
   monitor    Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
   @@unique([userId,host,port])
@@ -99,6 +105,8 @@ model KeyWordMonitor {
   keyWord            String
   keyWordType        KeyWordType?
   timeOut            Int        @default(30)
+  slowResponseAlertStatus  Boolean?  @default(false)
+  slowResponseAlertValue   Int?       @default(1000) 
   userId             Int
   monitor            Monitor?    @relation(fields: [id], references: [id], onDelete: Cascade)
   @@unique([userId, host, method])

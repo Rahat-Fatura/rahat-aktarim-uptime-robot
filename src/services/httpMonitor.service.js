@@ -43,6 +43,8 @@ const createHttpMonitor = async (monitorBody, userId) => {
         headers: monitorBody.httpMonitor.headers,
         allowedStatusCodes: monitorBody.httpMonitor.allowedStatusCodes,
         timeOut: monitorBody.httpMonitor.timeOut || 30,
+        slowResponseAlertStatus: monitorBody.httpMonitor.slowResponseAlertStatus,
+        slowResponseAlertValue: monitorBody.httpMonitor.slowResponseAlertValue,
         userId: Number(userId),
       },
     });

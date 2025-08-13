@@ -9,6 +9,7 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(3000),
     APP_URL: Joi.string().required().description('App url'),
+    APP_BACKEND: Joi.string().required().description('App backend url'),
     JWT_HEARTBEAT_CODE: Joi.string().required().description('JWT heartbeat code'),
     JWT_HEADER_STATIC_CODE: Joi.string().required().description('JWT header static code'),
     HEARTBEAT_URL: Joi.string().required().description('Heartbeat url'),
@@ -39,6 +40,7 @@ module.exports = {
   port: envVars.PORT,
   app: {
     url: envVars.APP_URL,
+    url_backend: envVars.APP_BACKEND,
     heartbeatUrl: envVars.HEARTBEAT_URL,
   },
   jwt: {

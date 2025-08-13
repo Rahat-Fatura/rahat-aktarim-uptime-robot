@@ -41,6 +41,8 @@ const createPortMonitor = async(monitorBody,userId) => {
             host: monitorBody.portMonitor.host,
             port: monitorBody.portMonitor.port,
             timeOut: monitorBody.portMonitor.timeOut,
+            slowResponseAlertStatus: monitorBody.portMonitor.slowResponseAlertStatus,
+            slowResponseAlertValue: monitorBody.portMonitor.slowResponseAlertValue,
             userId: Number(userId),
         }
     })

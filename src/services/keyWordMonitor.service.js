@@ -45,6 +45,9 @@ const createKeyWordMonitor = async(monitorBody,userId) =>{
         allowedStatusCodes: monitorBody.keyWordMonitor.allowedStatusCodes,
         keyWordType: monitorBody.keyWordMonitor.keyWordType,
         keyWord: monitorBody.keyWordMonitor.keyWord,
+        timeOut: monitorBody.keyWordMonitor.timeOut || 30,
+        slowResponseAlertStatus: monitorBody.keyWordMonitor.slowResponseAlertStatus,
+        slowResponseAlertValue: monitorBody.keyWordMonitor.slowResponseAlertValue,
         userId: Number(userId),
       }
     })

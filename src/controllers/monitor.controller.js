@@ -1,18 +1,20 @@
-const httpStatus = require('http-status');
-const catchAsync = require('../utils/catchAsync');
-const { monitorService } = require('../services');
-const { generateReportCollective, generateReport } = require('../Jobs/tasks/reportTask');
+const httpStatus = require("http-status");
+const catchAsync = require("../utils/catchAsync");
+const { monitorService } = require("../services");
 const {
-        monitorTask,
-        pingTask,
-        portTask,
-        keyWordTask,
-     } = require('../Jobs/tasks/index');
-const { renderMonitor } = require('../Jobs/renderMonitor');
-const { monitorParser } = require('../Jobs/monitorParser');
-const { reportTaskWorker } = require('../Jobs/reportTaskWorker');
-const { reportJobRender } = require('../Jobs/reportJobRender');
-console.log("Global:", global)
+  generateReportCollective,
+  generateReport,
+} = require("../Jobs/tasks/reportTask");
+const {
+  monitorTask,
+  pingTask,
+  portTask,
+  keyWordTask,
+} = require("../Jobs/tasks/index");
+const { renderMonitor } = require("../Jobs/renderMonitor");
+const { monitorParser } = require("../Jobs/monitorParser");
+const { reportTaskWorker } = require("../Jobs/reportTaskWorker");
+const { reportJobRender } = require("../Jobs/reportJobRender");
 
 monitorService.staytedsInQueue();
 reportJobRender();
@@ -42,16 +44,21 @@ const getMonitorForEdit = catchAsync(async (req, res) => {
 
 const getUserMonitors = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.params.userId);
-  monitors.map(monitor =>{
-    monitor.successRate = generateReport(monitor.logs)?generateReport(monitor.logs).successRate:'0%';
+  monitors.map((monitor) => {
+    monitor.successRate = generateReport(monitor.logs)
+      ? generateReport(monitor.logs).successRate
+      : "0%";
     delete monitor.logs;
-  }) 
+  });
   res.status(httpStatus.OK).send(monitors);
 });
 
 const updateMonitor = catchAsync(async (req, res) => {
   const updateData = req.body;
-  let monitor = await monitorService.updateMonitorById(req.params.monitorId, updateData);
+  let monitor = await monitorService.updateMonitorById(
+    req.params.monitorId,
+    updateData
+  );
   res.status(httpStatus.OK).send(monitor);
 });
 
@@ -65,12 +72,14 @@ const pauseMonitor = catchAsync(async (req, res) => {
     isActiveByOwner: false,
     status: "uncertain",
   });
-  
+
   res.status(httpStatus.OK).send(monitor);
 });
 
 const playMonitor = catchAsync(async (req, res) => {
-  const monitor = await monitorService.updateMonitorById(req.params.id, { isActiveByOwner: true });
+  const monitor = await monitorService.updateMonitorById(req.params.id, {
+    isActiveByOwner: true,
+  });
   res.status(httpStatus.OK).send(monitor);
 });
 
@@ -80,65 +89,74 @@ const deleteMonitors = catchAsync(async (req, res) => {
 });
 
 const pauseMonitors = catchAsync(async (req, res) => {
-  const monitors = await monitorService.updateMonitorsByIds(req.body.ids,{ isActiveByOwner: false, status: 'uncertain'});
+  const monitors = await monitorService.updateMonitorsByIds(req.body.ids, {
+    isActiveByOwner: false,
+    status: "uncertain",
+  });
   res.status(httpStatus.OK).send();
 });
 
 const playMonitors = catchAsync(async (req, res) => {
-  const monitors = await monitorService.updateMonitorsByIds(req.body.ids,{ isActiveByOwner: true});
+  const monitors = await monitorService.updateMonitorsByIds(req.body.ids, {
+    isActiveByOwner: true,
+  });
   res.status(httpStatus.OK).send();
 });
 
 const getMonitorWithLogs = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.user.id);
   if (!monitors) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
-  const report= generateReportCollective(monitors);
+  const report = generateReportCollective(monitors);
   res.status(httpStatus.OK).send(report);
 });
 
 const getMonitorWithLogsForAdmin = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitor(req.params.userId);
   if (!monitors) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
-  const report= generateReportCollective(monitors);
+  const report = generateReportCollective(monitors);
   res.status(httpStatus.OK).send(report);
 });
 
 const getInstantControlMonitor = catchAsync(async (req, res) => {
   const monitors = await monitorService.getInstantMonitors(req.user);
   if (!monitors) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
   res.status(httpStatus.OK).send(monitors);
 });
 
-const sentRequestInstantControlMonitor = catchAsync(async (req, res) =>  {
-  const monitor = await monitorService.getInstantControlMonitorById(req.params.id);
+const sentRequestInstantControlMonitor = catchAsync(async (req, res) => {
+  const monitor = await monitorService.getInstantControlMonitorById(
+    req.params.id
+  );
   if (!monitor) {
-    throw new Error('Monitor not found');
+    throw new Error("Monitor not found");
   }
   let response = null;
-  switch(monitor.monitorType){
-    case'HttpMonitor':{
+  switch (monitor.monitorType) {
+    case "HttpMonitor": {
       response = await monitorTask.sendRequest(monitor.httpMonitor);
       break;
     }
-    case'PingMonitor':{
+    case "PingMonitor": {
       response = await pingTask.sendPing(monitor.pingMonitor);
       break;
     }
-    case'PortMonitor':{
+    case "PortMonitor": {
       response = await portTask.controlPort(monitor.portMonitor);
       break;
     }
-    case'KeywordMonitor':{
-      response = await keyWordTask.sendRequestAndControlKey(monitor.keyWordMonitor);
+    case "KeywordMonitor": {
+      response = await keyWordTask.sendRequestAndControlKey(
+        monitor.keyWordMonitor
+      );
       break;
     }
-    default:{
+    default: {
       response = {
         status: 0,
         responseTime: 0,
@@ -148,14 +166,14 @@ const sentRequestInstantControlMonitor = catchAsync(async (req, res) =>  {
       break;
     }
   }
-  console.log(response)
+  console.log(response);
   res.status(httpStatus.OK).send(response);
 });
 
 const getMonitorsNamesAndIDs = catchAsync(async (req, res) => {
   const monitors = await monitorService.getMonitorsNamesAndIDs(req.user.id);
   if (!monitors) {
-    throw new Error('Monitors not found');
+    throw new Error("Monitors not found");
   }
   res.status(httpStatus.OK).send(monitors);
 });
@@ -177,5 +195,5 @@ module.exports = {
   pauseMonitors,
   playMonitors,
   getMonitorsNamesAndIDs,
-  getMonitorForEdit
+  getMonitorForEdit,
 };

@@ -35,6 +35,8 @@ const createPingMonitor = async(monitorBody,userId) => {
         data:{
             id: monitor.id,
             host: monitorBody.pingMonitor.host,
+            slowResponseAlertStatus: monitorBody.pingMonitor.slowResponseAlertStatus,
+            slowResponseAlertValue: monitorBody.pingMonitor.slowResponseAlertValue,
             userId: Number(userId),
         }
     })
